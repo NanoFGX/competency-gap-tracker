@@ -9,11 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TimelineRouteImport } from './routes/timeline'
 import { Route as MentorRouteImport } from './routes/mentor'
 import { Route as EvidenceRouteImport } from './routes/evidence'
 import { Route as CareerRouteImport } from './routes/career'
 import { Route as IndexRouteImport } from './routes/index'
 
+const TimelineRoute = TimelineRouteImport.update({
+  id: '/timeline',
+  path: '/timeline',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MentorRoute = MentorRouteImport.update({
   id: '/mentor',
   path: '/mentor',
@@ -40,12 +46,14 @@ export interface FileRoutesByFullPath {
   '/career': typeof CareerRoute
   '/evidence': typeof EvidenceRoute
   '/mentor': typeof MentorRoute
+  '/timeline': typeof TimelineRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/career': typeof CareerRoute
   '/evidence': typeof EvidenceRoute
   '/mentor': typeof MentorRoute
+  '/timeline': typeof TimelineRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,14 @@ export interface FileRoutesById {
   '/career': typeof CareerRoute
   '/evidence': typeof EvidenceRoute
   '/mentor': typeof MentorRoute
+  '/timeline': typeof TimelineRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/career' | '/evidence' | '/mentor'
+  fullPaths: '/' | '/career' | '/evidence' | '/mentor' | '/timeline'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/career' | '/evidence' | '/mentor'
-  id: '__root__' | '/' | '/career' | '/evidence' | '/mentor'
+  to: '/' | '/career' | '/evidence' | '/mentor' | '/timeline'
+  id: '__root__' | '/' | '/career' | '/evidence' | '/mentor' | '/timeline'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,10 +76,18 @@ export interface RootRouteChildren {
   CareerRoute: typeof CareerRoute
   EvidenceRoute: typeof EvidenceRoute
   MentorRoute: typeof MentorRoute
+  TimelineRoute: typeof TimelineRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/timeline': {
+      id: '/timeline'
+      path: '/timeline'
+      fullPath: '/timeline'
+      preLoaderRoute: typeof TimelineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mentor': {
       id: '/mentor'
       path: '/mentor'
@@ -107,6 +124,7 @@ const rootRouteChildren: RootRouteChildren = {
   CareerRoute: CareerRoute,
   EvidenceRoute: EvidenceRoute,
   MentorRoute: MentorRoute,
+  TimelineRoute: TimelineRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
