@@ -9,6 +9,8 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { StudentProvider } from "@/lib/student-context";
+import { AppShell } from "@/components/app-shell";
 
 function NotFoundComponent() {
   return (
@@ -72,11 +74,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Competency Gap Tracker" },
+      { name: "description", content: "Track, evaluate, and visualize professional competencies for final-year Computer Science students." },
+      { property: "og:title", content: "Competency Gap Tracker" },
+      { property: "og:description", content: "Evidence-based competency profiles and gap analysis for CS students and lecturers." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
@@ -113,7 +114,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <StudentProvider>
+        <AppShell>
+          <Outlet />
+        </AppShell>
+      </StudentProvider>
     </QueryClientProvider>
   );
 }
