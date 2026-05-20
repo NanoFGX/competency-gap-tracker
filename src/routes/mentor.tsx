@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Check, X } from "lucide-react";
 import { COMPETENCIES, evidence as seedEvidence, mentors, students, type Competency } from "@/lib/mock-data";
 import { Card, CardHeader, PageHeader } from "@/components/page-header";
-import { StatusBadge } from "./index";
+import { StatusBadge } from "@/components/badges";
 
 export const Route = createFileRoute("/mentor")({
   head: () => ({ meta: [{ title: "Mentor Review — Competency Tracker" }] }),

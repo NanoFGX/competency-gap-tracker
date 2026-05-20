@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { useStudent } from "@/lib/student-context";
 import { COMPETENCIES, careerTargets, latestScores, type Competency } from "@/lib/mock-data";
 import { Card, CardHeader, PageHeader } from "@/components/page-header";
-import { Pill } from "./index";
+import { Pill } from "@/components/badges";
 
 export const Route = createFileRoute("/career")({
   head: () => ({ meta: [{ title: "Career Target — Competency Tracker" }] }),

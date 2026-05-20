@@ -4,7 +4,7 @@ import { Github, FileText, Presentation, Trophy, Link2, Plus } from "lucide-reac
 import { useStudent } from "@/lib/student-context";
 import { COMPETENCIES, evidence as seedEvidence, type Competency, type Evidence, type EvidenceType } from "@/lib/mock-data";
 import { Card, CardHeader, PageHeader } from "@/components/page-header";
-import { StatusBadge } from "./index";
+import { StatusBadge } from "@/components/badges";
 
 export const Route = createFileRoute("/evidence")({
   head: () => ({ meta: [{ title: "Evidence — Competency Tracker" }] }),
