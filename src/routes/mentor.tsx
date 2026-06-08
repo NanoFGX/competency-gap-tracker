@@ -80,14 +80,12 @@ function MentorPage() {
                       <StatusBadge status={status} />
                       <button
                         onClick={() => setDecisions((d) => ({ ...d, [e.id]: "Approved" }))}
-                        className="h-7 w-7 grid place-items-center rounded-md border border-border hover:bg-accent text-[color:oklch(0.45_0.1_155)]"
-                        title="Approve"
-                      ><Check className="h-3.5 w-3.5" /></button>
+                        className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-[color:var(--success)] hover:bg-[color:var(--success)]/10 hover:border-[color:var(--success)]/40"
+                      ><Check className="h-3.5 w-3.5" /> Approve</button>
                       <button
                         onClick={() => setDecisions((d) => ({ ...d, [e.id]: "Rejected" }))}
-                        className="h-7 w-7 grid place-items-center rounded-md border border-border hover:bg-accent text-destructive"
-                        title="Reject"
-                      ><X className="h-3.5 w-3.5" /></button>
+                        className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10 hover:border-destructive/40"
+                      ><X className="h-3.5 w-3.5" /> Reject</button>
                     </div>
                   </li>
                 );

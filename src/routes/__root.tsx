@@ -10,6 +10,7 @@ import {
 
 import appCss from "../styles.css?url";
 import { StudentProvider } from "@/lib/student-context";
+import { RoleProvider } from "@/lib/role-context";
 import { AppShell } from "@/components/app-shell";
 
 function NotFoundComponent() {
@@ -114,11 +115,13 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <StudentProvider>
-        <AppShell>
-          <Outlet />
-        </AppShell>
-      </StudentProvider>
+      <RoleProvider>
+        <StudentProvider>
+          <AppShell>
+            <Outlet />
+          </AppShell>
+        </StudentProvider>
+      </RoleProvider>
     </QueryClientProvider>
   );
 }

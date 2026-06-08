@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from "recharts";
-import { ArrowUpRight, TrendingUp, TrendingDown } from "lucide-react";
+import { ArrowUpRight, TrendingUp, TrendingDown, AlertTriangle } from "lucide-react";
 import { useStudent } from "@/lib/student-context";
-import { COMPETENCIES, evaluations, evidence, latestScores, readinessScore, strengthsWeaknesses, tier } from "@/lib/mock-data";
+import { COMPETENCIES, careerTargets, evaluations, evidence, latestScores, readinessScore, strengthsWeaknesses, tier } from "@/lib/mock-data";
 import { Card, CardHeader, PageHeader } from "@/components/page-header";
 import { Pill, StatusBadge } from "@/components/badges";
 
@@ -22,6 +22,9 @@ function Dashboard() {
 
   const radarData = COMPETENCIES.map((c) => ({ competency: c, score: scores[c], full: 5 }));
 
+  const target = careerTargets["Software Engineer"];
+  const gaps = COMPETENCIES.filter((c) => scores[c] < target[c]).sort((a, b) => (scores[a] - target[a]) - (scores[b] - target[b]));
+
   return (
     <>
       <PageHeader
@@ -29,7 +32,20 @@ function Dashboard() {
         description={`${student.program} · ${student.email}`}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      {gaps.length > 0 && (
+        <div className="cgt-rise mb-6 flex items-start gap-3 rounded-lg border border-[color:var(--warning)]/40 bg-[color:var(--warning)]/10 px-4 py-3">
+          <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0 text-[color:var(--warning)]" />
+          <div className="text-sm">
+            <span className="font-medium">Skill gap detected.</span>{" "}
+            <span className="text-muted-foreground">
+              {gaps.slice(0, 2).map((c) => `${c} is ${scores[c]}/${target[c]} for Software Engineer`).join("; ")}. Add targeted evidence to close the gap.
+            </span>{" "}
+            <Link to="/career" className="font-medium text-primary hover:underline whitespace-nowrap">Review target →</Link>
+          </div>
+        </div>
+      )}
+
+      <div className="cgt-rise grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Stat label="Career Readiness" value={`${score}%`} hint="Composite of latest mentor scores" />
         <Stat label="Evaluations" value={String(evals.length)} hint={`Across ${new Set(evals.map((e) => e.mentorId)).size} mentors`} />
         <Stat label="Evidence Approved" value={`${approved}/${evs.length}`} hint="Validated submissions" />

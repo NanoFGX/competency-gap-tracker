@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TimelineRouteImport } from './routes/timeline'
+import { Route as SelfCheckRouteImport } from './routes/self-check'
+import { Route as RecruiterRouteImport } from './routes/recruiter'
 import { Route as MentorRouteImport } from './routes/mentor'
 import { Route as EvidenceRouteImport } from './routes/evidence'
 import { Route as CareerRouteImport } from './routes/career'
@@ -18,6 +20,16 @@ import { Route as IndexRouteImport } from './routes/index'
 const TimelineRoute = TimelineRouteImport.update({
   id: '/timeline',
   path: '/timeline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SelfCheckRoute = SelfCheckRouteImport.update({
+  id: '/self-check',
+  path: '/self-check',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecruiterRoute = RecruiterRouteImport.update({
+  id: '/recruiter',
+  path: '/recruiter',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MentorRoute = MentorRouteImport.update({
@@ -46,6 +58,8 @@ export interface FileRoutesByFullPath {
   '/career': typeof CareerRoute
   '/evidence': typeof EvidenceRoute
   '/mentor': typeof MentorRoute
+  '/recruiter': typeof RecruiterRoute
+  '/self-check': typeof SelfCheckRoute
   '/timeline': typeof TimelineRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +67,8 @@ export interface FileRoutesByTo {
   '/career': typeof CareerRoute
   '/evidence': typeof EvidenceRoute
   '/mentor': typeof MentorRoute
+  '/recruiter': typeof RecruiterRoute
+  '/self-check': typeof SelfCheckRoute
   '/timeline': typeof TimelineRoute
 }
 export interface FileRoutesById {
@@ -61,14 +77,38 @@ export interface FileRoutesById {
   '/career': typeof CareerRoute
   '/evidence': typeof EvidenceRoute
   '/mentor': typeof MentorRoute
+  '/recruiter': typeof RecruiterRoute
+  '/self-check': typeof SelfCheckRoute
   '/timeline': typeof TimelineRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/career' | '/evidence' | '/mentor' | '/timeline'
+  fullPaths:
+    | '/'
+    | '/career'
+    | '/evidence'
+    | '/mentor'
+    | '/recruiter'
+    | '/self-check'
+    | '/timeline'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/career' | '/evidence' | '/mentor' | '/timeline'
-  id: '__root__' | '/' | '/career' | '/evidence' | '/mentor' | '/timeline'
+  to:
+    | '/'
+    | '/career'
+    | '/evidence'
+    | '/mentor'
+    | '/recruiter'
+    | '/self-check'
+    | '/timeline'
+  id:
+    | '__root__'
+    | '/'
+    | '/career'
+    | '/evidence'
+    | '/mentor'
+    | '/recruiter'
+    | '/self-check'
+    | '/timeline'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,6 +116,8 @@ export interface RootRouteChildren {
   CareerRoute: typeof CareerRoute
   EvidenceRoute: typeof EvidenceRoute
   MentorRoute: typeof MentorRoute
+  RecruiterRoute: typeof RecruiterRoute
+  SelfCheckRoute: typeof SelfCheckRoute
   TimelineRoute: typeof TimelineRoute
 }
 
@@ -86,6 +128,20 @@ declare module '@tanstack/react-router' {
       path: '/timeline'
       fullPath: '/timeline'
       preLoaderRoute: typeof TimelineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/self-check': {
+      id: '/self-check'
+      path: '/self-check'
+      fullPath: '/self-check'
+      preLoaderRoute: typeof SelfCheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recruiter': {
+      id: '/recruiter'
+      path: '/recruiter'
+      fullPath: '/recruiter'
+      preLoaderRoute: typeof RecruiterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mentor': {
@@ -124,6 +180,8 @@ const rootRouteChildren: RootRouteChildren = {
   CareerRoute: CareerRoute,
   EvidenceRoute: EvidenceRoute,
   MentorRoute: MentorRoute,
+  RecruiterRoute: RecruiterRoute,
+  SelfCheckRoute: SelfCheckRoute,
   TimelineRoute: TimelineRoute,
 }
 export const routeTree = rootRouteImport
