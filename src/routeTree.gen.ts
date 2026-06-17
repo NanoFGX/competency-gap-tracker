@@ -10,9 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TimelineRouteImport } from './routes/timeline'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SelfCheckRouteImport } from './routes/self-check'
 import { Route as RecruiterRouteImport } from './routes/recruiter'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as MentorRouteImport } from './routes/mentor'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as EvidenceRouteImport } from './routes/evidence'
 import { Route as CareerRouteImport } from './routes/career'
 import { Route as IndexRouteImport } from './routes/index'
@@ -20,6 +23,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const TimelineRoute = TimelineRouteImport.update({
   id: '/timeline',
   path: '/timeline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SelfCheckRoute = SelfCheckRouteImport.update({
@@ -32,9 +40,19 @@ const RecruiterRoute = RecruiterRouteImport.update({
   path: '/recruiter',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MentorRoute = MentorRouteImport.update({
   id: '/mentor',
   path: '/mentor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EvidenceRoute = EvidenceRouteImport.update({
@@ -57,18 +75,24 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/career': typeof CareerRoute
   '/evidence': typeof EvidenceRoute
+  '/login': typeof LoginRoute
   '/mentor': typeof MentorRoute
+  '/profile': typeof ProfileRoute
   '/recruiter': typeof RecruiterRoute
   '/self-check': typeof SelfCheckRoute
+  '/signup': typeof SignupRoute
   '/timeline': typeof TimelineRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/career': typeof CareerRoute
   '/evidence': typeof EvidenceRoute
+  '/login': typeof LoginRoute
   '/mentor': typeof MentorRoute
+  '/profile': typeof ProfileRoute
   '/recruiter': typeof RecruiterRoute
   '/self-check': typeof SelfCheckRoute
+  '/signup': typeof SignupRoute
   '/timeline': typeof TimelineRoute
 }
 export interface FileRoutesById {
@@ -76,9 +100,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/career': typeof CareerRoute
   '/evidence': typeof EvidenceRoute
+  '/login': typeof LoginRoute
   '/mentor': typeof MentorRoute
+  '/profile': typeof ProfileRoute
   '/recruiter': typeof RecruiterRoute
   '/self-check': typeof SelfCheckRoute
+  '/signup': typeof SignupRoute
   '/timeline': typeof TimelineRoute
 }
 export interface FileRouteTypes {
@@ -87,27 +114,36 @@ export interface FileRouteTypes {
     | '/'
     | '/career'
     | '/evidence'
+    | '/login'
     | '/mentor'
+    | '/profile'
     | '/recruiter'
     | '/self-check'
+    | '/signup'
     | '/timeline'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/career'
     | '/evidence'
+    | '/login'
     | '/mentor'
+    | '/profile'
     | '/recruiter'
     | '/self-check'
+    | '/signup'
     | '/timeline'
   id:
     | '__root__'
     | '/'
     | '/career'
     | '/evidence'
+    | '/login'
     | '/mentor'
+    | '/profile'
     | '/recruiter'
     | '/self-check'
+    | '/signup'
     | '/timeline'
   fileRoutesById: FileRoutesById
 }
@@ -115,9 +151,12 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CareerRoute: typeof CareerRoute
   EvidenceRoute: typeof EvidenceRoute
+  LoginRoute: typeof LoginRoute
   MentorRoute: typeof MentorRoute
+  ProfileRoute: typeof ProfileRoute
   RecruiterRoute: typeof RecruiterRoute
   SelfCheckRoute: typeof SelfCheckRoute
+  SignupRoute: typeof SignupRoute
   TimelineRoute: typeof TimelineRoute
 }
 
@@ -128,6 +167,13 @@ declare module '@tanstack/react-router' {
       path: '/timeline'
       fullPath: '/timeline'
       preLoaderRoute: typeof TimelineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/self-check': {
@@ -144,11 +190,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecruiterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mentor': {
       id: '/mentor'
       path: '/mentor'
       fullPath: '/mentor'
       preLoaderRoute: typeof MentorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/evidence': {
@@ -179,9 +239,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CareerRoute: CareerRoute,
   EvidenceRoute: EvidenceRoute,
+  LoginRoute: LoginRoute,
   MentorRoute: MentorRoute,
+  ProfileRoute: ProfileRoute,
   RecruiterRoute: RecruiterRoute,
   SelfCheckRoute: SelfCheckRoute,
+  SignupRoute: SignupRoute,
   TimelineRoute: TimelineRoute,
 }
 export const routeTree = rootRouteImport

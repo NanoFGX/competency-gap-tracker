@@ -5,6 +5,7 @@ import { useStudent } from "@/lib/student-context";
 import { COMPETENCIES, latestScores, type Competency } from "@/lib/mock-data";
 import { Card, CardHeader, PageHeader } from "@/components/page-header";
 import { Pill } from "@/components/badges";
+import { ScoreLegend } from "@/components/ui";
 
 export const Route = createFileRoute("/self-check")({
   head: () => ({ meta: [{ title: "Self-check — Competency Tracker" }] }),
@@ -28,7 +29,7 @@ function SelfCheck() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [answer, setAnswer] = useState<number | null>(2);
   const [selfRating, setSelfRating] = useState<Record<Competency, number>>(
-    () => COMPETENCIES.reduce((a, c) => ({ ...a, [c]: 3 }), {} as Record<Competency, number>),
+    () => COMPETENCIES.reduce((a, c) => ({ ...a, [c]: 5 }), {} as Record<Competency, number>),
   );
 
   return (
@@ -73,14 +74,17 @@ function SelfCheck() {
 
       {step === 2 && (
         <Card className="max-w-2xl cgt-rise">
-          <CardHeader title="Rate yourself 1–5" description="Where do you think you stand on each competency right now?" />
+          <CardHeader title="Rate yourself 1–10" description="Where do you think you stand on each competency right now?" />
+          <div className="px-5 py-2.5 border-b border-border/50 bg-muted/20">
+            <ScoreLegend />
+          </div>
           <div className="p-5 space-y-4">
             {COMPETENCIES.map((c) => (
               <div key={c}>
                 <div className="flex items-center justify-between text-sm">
-                  <span>{c}</span><span className="font-mono text-xs text-muted-foreground">{selfRating[c]}/5</span>
+                  <span>{c}</span><span className="font-mono text-xs text-muted-foreground">{selfRating[c]}/10</span>
                 </div>
-                <input type="range" min={1} max={5} step={1} value={selfRating[c]}
+                <input type="range" min={1} max={10} step={1} value={selfRating[c]}
                   onChange={(e) => setSelfRating((s) => ({ ...s, [c]: Number(e.target.value) }))}
                   className="mt-1.5 w-full accent-[color:var(--primary)]" />
               </div>
@@ -114,20 +118,20 @@ function SelfCheck() {
             <div className="p-5 space-y-3">
               {COMPETENCIES.map((c) => {
                 const self = selfRating[c]; const m = mentor[c]; const delta = self - m;
-                const tag = delta >= 2 ? "over-confident" : delta <= -2 ? "under-rated" : "calibrated";
+                const tag = delta >= 3 ? "over-confident" : delta <= -3 ? "under-rated" : "calibrated";
                 const tone = tag === "calibrated" ? "strong" : "developing";
                 return (
                   <div key={c} className="flex items-center gap-3 text-sm">
                     <span className="w-36 shrink-0 text-muted-foreground">{c}</span>
                     <div className="relative flex-1 h-3.5 rounded bg-muted border border-border">
-                      <div className="absolute inset-y-0 left-0 rounded bg-primary/70" style={{ width: `${(self / 5) * 100}%` }} />
-                      <div className="absolute -top-1 -bottom-1 w-0.5 bg-foreground" style={{ left: `${(m / 5) * 100}%` }} title={`mentor ${m}/5`} />
+                      <div className="absolute inset-y-0 left-0 rounded bg-primary/70" style={{ width: `${(self / 10) * 100}%` }} />
+                      <div className="absolute -top-1 -bottom-1 w-0.5 bg-foreground" style={{ left: `${(m / 10) * 100}%` }} title={`mentor ${m}/10`} />
                     </div>
                     <span className="w-24 text-right"><Pill tone={tone as "strong" | "developing"}>{tag}</Pill></span>
                   </div>
                 );
               })}
-              <p className="pt-1 text-xs text-muted-foreground">Bar = your self-rating · marker = mentor-validated score.</p>
+              <p className="pt-1 text-xs text-muted-foreground">Bar = your self-rating · marker = mentor-validated score · scale 1–10.</p>
               <div className="flex justify-end">
                 <button onClick={() => setStep(1)} className="rounded-md border border-border px-3 py-2 text-sm hover:bg-accent">Try another scenario</button>
               </div>

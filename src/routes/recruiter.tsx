@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Search, Check, Minus, X, ShieldCheck, Star, ExternalLink, Zap } from "lucide-react";
+import { Search, Star, FileText, CheckCircle2, AlertCircle, TrendingUp, BarChart2 } from "lucide-react";
 import {
-  COMPETENCIES, students, evidence as allEvidence, careerTargets,
-  latestScores, readinessScore, strengthsWeaknesses, type Competency, type Evidence,
+  COMPETENCIES, students, evidence as allEvidence, evaluations, careerTargets,
+  latestScores, readinessScore, strengthsWeaknesses, type Competency,
 } from "@/lib/mock-data";
 import { Card, CardHeader, PageHeader } from "@/components/page-header";
 import { Pill } from "@/components/badges";
@@ -13,7 +13,15 @@ export const Route = createFileRoute("/recruiter")({
   component: RecruiterPage,
 });
 
-type Decision = "Confirmed" | "Partial" | "Needs proof";
+const AVATAR_COLORS = [
+  "bg-blue-100 text-blue-700",
+  "bg-violet-100 text-violet-700",
+  "bg-emerald-100 text-emerald-700",
+];
+
+function initials(name: string) {
+  return name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+}
 
 function RecruiterPage() {
   const roles = Object.keys(careerTargets);
@@ -21,35 +29,52 @@ function RecruiterPage() {
   const [query, setQuery] = useState("");
   const [minReadiness, setMinReadiness] = useState(0);
   const [selectedId, setSelectedId] = useState(students[0].id);
-  const [reviewing, setReviewing] = useState<Evidence | null>(null);
-  const [decisions, setDecisions] = useState<Record<string, Decision>>({});
 
   const target = careerTargets[roleTarget];
 
   const ranked = useMemo(() => {
     return students
-      .map((s) => {
+      .map((s, i) => {
         const scores = latestScores(s.id);
         const readiness = readinessScore(scores);
         const fit = Math.round((COMPETENCIES.filter((c) => scores[c] >= target[c]).length / COMPETENCIES.length) * 100);
-        return { ...s, scores, readiness, fit };
+        return { ...s, scores, readiness, fit, colorClass: AVATAR_COLORS[i % AVATAR_COLORS.length] };
       })
       .filter((s) => s.name.toLowerCase().includes(query.toLowerCase()) && s.readiness >= minReadiness)
       .sort((a, b) => b.fit - a.fit || b.readiness - a.readiness);
   }, [query, minReadiness, roleTarget]);
 
   const selected = students.find((s) => s.id === selectedId)!;
+  const selectedIdx = students.findIndex((s) => s.id === selectedId);
   const scores = latestScores(selected.id);
   const readiness = readinessScore(scores);
   const { strengths } = strengthsWeaknesses(scores);
   const fit = Math.round((COMPETENCIES.filter((c) => scores[c] >= target[c]).length / COMPETENCIES.length) * 100);
   const candidateEvidence = allEvidence.filter((e) => e.studentId === selected.id);
+  const approvedEvidence = candidateEvidence.filter((e) => e.status === "Approved");
+  const pendingEvidence = candidateEvidence.filter((e) => e.status === "Pending");
+  const approvalRate = candidateEvidence.length > 0 ? Math.round((approvedEvidence.length / candidateEvidence.length) * 100) : 0;
+  const candidateEvals = evaluations.filter((e) => e.studentId === selected.id).sort((a, b) => a.date.localeCompare(b.date));
+  const topCompetency = [...COMPETENCIES].sort((a, b) => scores[b] - scores[a])[0];
+  const weakestCompetency = [...COMPETENCIES].sort((a, b) => scores[a] - scores[b])[0];
+  const gapCount = COMPETENCIES.filter((c) => scores[c] < target[c]).length;
+  const totalGap = COMPETENCIES.reduce((s, c) => s + Math.max(0, target[c] - scores[c]), 0);
+  const firstEval = candidateEvals[0];
+  const lastEval = candidateEvals.at(-1);
+  const firstReadiness = firstEval ? readinessScore(firstEval.scores) : readiness;
+  const readinessDelta = readiness - firstReadiness;
+  const rejectedEvidence = candidateEvidence.filter((e) => e.status === "Rejected");
+  const avgMentorScore = candidateEvals.length > 0
+    ? (candidateEvals.reduce((sum, ev) => sum + (COMPETENCIES.reduce((s, c) => s + ev.scores[c], 0) / COMPETENCIES.length), 0) / candidateEvals.length).toFixed(1)
+    : "—";
+  const evidenceTypes = candidateEvidence.reduce((acc, e) => { acc[e.type] = (acc[e.type] ?? 0) + 1; return acc; }, {} as Record<string, number>);
+  const avatarColor = AVATAR_COLORS[selectedIdx % AVATAR_COLORS.length];
 
   return (
     <>
       <PageHeader
         title="Candidate pipeline"
-        description="Screen final-year students by mentor-validated competency, not just CGPA. Compare each profile against a target role and validate claims in seconds."
+        description="Screen final-year students by mentor-validated competency. Compare each profile against a target role."
         actions={
           <label className="flex items-center gap-2 text-sm">
             <span className="text-muted-foreground hidden sm:inline">Target role</span>
@@ -64,9 +89,9 @@ function RecruiterPage() {
         }
       />
 
-      {/* filters */}
-      <div className="mb-5 flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[220px]">
+      {/* Filters */}
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <div className="relative flex-1 min-w-[200px]">
           <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             value={query}
@@ -79,215 +104,224 @@ function RecruiterPage() {
           Min readiness
           <input type="range" min={0} max={100} step={5} value={minReadiness}
             onChange={(e) => setMinReadiness(Number(e.target.value))}
-            className="w-32 accent-[color:var(--primary)]" />
+            className="w-28 accent-[color:var(--primary)]" />
           <span className="font-mono text-foreground w-9 text-right">{minReadiness}%</span>
         </label>
-        <span className="text-sm text-muted-foreground">{ranked.length} shown</span>
+        <span className="text-sm text-muted-foreground">{ranked.length} candidate{ranked.length !== 1 ? "s" : ""}</span>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* candidate list */}
-        <div className="lg:col-span-1 space-y-3">
+      {/* Candidate selector grid */}
+      {ranked.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-border p-10 text-center text-sm text-muted-foreground mb-4">
+          No candidates meet these filters.
+        </div>
+      ) : (
+        <div className={`grid gap-3 mb-5 ${ranked.length === 1 ? "grid-cols-1 max-w-xs" : ranked.length === 2 ? "grid-cols-2" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
           {ranked.map((s, i) => {
             const active = s.id === selectedId;
             return (
               <button
                 key={s.id}
                 onClick={() => setSelectedId(s.id)}
-                style={{ animationDelay: `${i * 50}ms` }}
-                className={`cgt-rise w-full text-left rounded-lg border bg-card p-4 transition-colors ${
-                  active ? "border-primary ring-1 ring-primary/30" : "border-border hover:border-muted-foreground/40"
+                className={`group text-left rounded-xl border p-4 transition-all ${
+                  active
+                    ? "border-primary ring-2 ring-primary/20 bg-card shadow-sm"
+                    : "border-border bg-card hover:border-muted-foreground/40 hover:shadow-sm"
                 }`}
               >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold truncate">{s.name}</div>
-                    <div className="text-xs text-muted-foreground truncate">{s.program}</div>
+                <div className="flex items-start gap-3">
+                  <div className={`h-10 w-10 shrink-0 rounded-full grid place-items-center text-sm font-semibold ${s.colorClass}`}>
+                    {initials(s.name)}
                   </div>
-                  <Donut value={s.fit} size={44} label="fit" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="text-sm font-semibold truncate">{s.name}</div>
+                      {i === 0 && <Pill tone="strong">Top</Pill>}
+                    </div>
+                    <div className="text-xs text-muted-foreground truncate mt-0.5">{s.program}</div>
+                  </div>
                 </div>
-                <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="inline-flex items-center gap-1"><Star className="h-3 w-3 text-[color:var(--warning)]" /> {s.readiness}% ready</span>
-                  {i === 0 && <Pill tone="strong">Top match</Pill>}
+
+                <div className="mt-3 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="text-center">
+                      <div className="text-lg font-bold tracking-tight leading-none">{s.fit}%</div>
+                      <div className="text-[10px] text-muted-foreground mt-0.5">role fit</div>
+                    </div>
+                    <div className="h-8 w-px bg-border" />
+                    <div className="text-center">
+                      <div className="text-lg font-bold tracking-tight leading-none">{s.readiness}%</div>
+                      <div className="text-[10px] text-muted-foreground mt-0.5">readiness</div>
+                    </div>
+                  </div>
+                  <div className="flex-1 mx-3">
+                    {/* Mini competency bars */}
+                    <div className="space-y-1">
+                      {COMPETENCIES.slice(0, 3).map((c) => {
+                        const v = s.scores[c];
+                        const t = target[c];
+                        return (
+                          <div key={c} className="flex items-center gap-1.5">
+                            <div className="relative h-1.5 flex-1 rounded-full bg-muted">
+                              <div
+                                className={`absolute inset-y-0 left-0 rounded-full ${v >= t ? "bg-[color:var(--success)]" : "bg-primary/70"}`}
+                                style={{ width: `${(v / 10) * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <Donut value={s.fit} size={40} />
+                </div>
+
+                <div className="mt-3 flex flex-wrap gap-1">
+                  {strengthsWeaknesses(s.scores).strengths.map((c) => (
+                    <span key={c} className="inline-flex items-center gap-0.5 rounded-md bg-muted/60 border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                      <Star className="h-2.5 w-2.5 text-[color:var(--warning)]" />{c}
+                    </span>
+                  ))}
                 </div>
               </button>
             );
           })}
-          {ranked.length === 0 && (
-            <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-              No candidates meet these filters.
-            </div>
-          )}
         </div>
+      )}
 
-        {/* candidate detail */}
-        <div className="lg:col-span-2 space-y-4">
-          <Card>
-            <div className="p-5 flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <Donut value={fit} size={68} label="role fit" />
-                <div>
-                  <div className="text-lg font-semibold tracking-tight">{selected.name}</div>
-                  <div className="text-sm text-muted-foreground">{selected.email}</div>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {strengths.map((c) => (<Pill key={c} tone="strong">{c}</Pill>))}
-                  </div>
-                </div>
+      {/* Selected candidate detail */}
+      <div className="space-y-4">
+        {/* Header card */}
+        <Card>
+          <div className="p-5 flex flex-wrap items-center gap-5">
+            <div className={`h-14 w-14 shrink-0 rounded-full grid place-items-center text-lg font-bold ${avatarColor}`}>
+              {initials(selected.name)}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-lg font-semibold tracking-tight">{selected.name}</div>
+              <div className="text-sm text-muted-foreground">{selected.email}</div>
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {strengths.map((c) => (<Pill key={c} tone="strong">{c}</Pill>))}
               </div>
-              <div className="text-right">
+            </div>
+            <div className="flex items-center gap-6 shrink-0">
+              <div className="text-center">
+                <div className="text-3xl font-semibold tracking-tight">{fit}%</div>
+                <div className="text-xs text-muted-foreground">role fit</div>
+              </div>
+              <div className="text-center">
                 <div className="text-3xl font-semibold tracking-tight">{readiness}%</div>
                 <div className="text-xs text-muted-foreground">overall readiness</div>
               </div>
             </div>
-          </Card>
+          </div>
+        </Card>
 
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Competency bars */}
           <Card>
-            <CardHeader title="Competency vs role target" description={`Bars are mentor-validated scores; the marker is the ${roleTarget} requirement.`} />
+            <CardHeader title="Competency vs role target" description={`Mentor-validated scores · marker = ${roleTarget} requirement`} />
             <div className="p-5 space-y-3">
               {COMPETENCIES.map((c) => {
                 const v = scores[c]; const t = target[c]; const met = v >= t;
                 return (
                   <div key={c} className="flex items-center gap-3 text-sm">
-                    <span className="w-36 shrink-0 text-muted-foreground">{c}</span>
+                    <span className="w-32 shrink-0 text-muted-foreground text-xs">{c}</span>
                     <div className="relative flex-1 h-3.5 rounded bg-muted border border-border">
-                      <div className={`absolute inset-y-0 left-0 rounded ${met ? "bg-[color:var(--success)]" : "bg-primary"}`} style={{ width: `${(v / 5) * 100}%` }} />
-                      <div className="absolute -top-1 -bottom-1 w-0.5 bg-foreground" style={{ left: `${(t / 5) * 100}%` }} title={`target ${t}/5`} />
+                      <div className={`absolute inset-y-0 left-0 rounded ${met ? "bg-[color:var(--success)]" : "bg-primary"}`} style={{ width: `${(v / 10) * 100}%` }} />
+                      <div className="absolute -top-1 -bottom-1 w-0.5 bg-foreground/50" style={{ left: `${(t / 10) * 100}%` }} title={`target ${t}/10`} />
                     </div>
-                    <span className={`w-12 text-right font-mono text-xs ${met ? "text-[color:var(--success)]" : "text-muted-foreground"}`}>{v}/{t}</span>
+                    <span className={`w-10 text-right font-mono text-xs ${met ? "text-[color:var(--success)]" : "text-muted-foreground"}`}>{v}/{t}</span>
                   </div>
                 );
               })}
             </div>
           </Card>
 
+          {/* Stats */}
           <Card>
-            <CardHeader title="Validate claims" description="Confirm evidence in under 30 seconds. Verified claims raise the candidate's trust signal." />
-            <ul className="divide-y divide-border">
-              {candidateEvidence.map((e) => {
-                const d = decisions[e.id];
-                return (
-                  <li key={e.id} className="px-5 py-3.5 flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="text-sm font-medium flex items-center gap-2">
-                        {e.title}
-                        {e.link && <ExternalLink className="h-3 w-3 text-muted-foreground" />}
+            <CardHeader title="Candidate Statistics" description="Evidence, approval rate, mentor sessions, and growth" />
+            <div className="p-5 grid grid-cols-2 gap-3">
+              <MiniStat icon={<FileText className="h-3.5 w-3.5" />} label="Total evidence" value={String(candidateEvidence.length)} />
+              <MiniStat icon={<CheckCircle2 className="h-3.5 w-3.5 text-[color:var(--success)]" />} label="Approved" value={`${approvedEvidence.length} (${approvalRate}%)`} />
+              <MiniStat icon={<AlertCircle className="h-3.5 w-3.5 text-[color:var(--warning)]" />} label="Pending review" value={String(pendingEvidence.length)} />
+              <MiniStat icon={<BarChart2 className="h-3.5 w-3.5 text-destructive" />} label="Rejected" value={String(rejectedEvidence.length)} />
+              <MiniStat icon={<TrendingUp className="h-3.5 w-3.5 text-[color:var(--success)]" />} label="Readiness growth" value={readinessDelta >= 0 ? `+${readinessDelta}%` : `${readinessDelta}%`} />
+              <MiniStat icon={<Star className="h-3.5 w-3.5 text-[color:var(--warning)]" />} label="Top competency" value={topCompetency} />
+              <MiniStat icon={<BarChart2 className="h-3.5 w-3.5 text-primary" />} label="Role gap" value={`${gapCount} skills · ${totalGap} pts`} />
+              <MiniStat icon={<CheckCircle2 className="h-3.5 w-3.5 text-primary" />} label="Mentor sessions" value={String(candidateEvals.length)} />
+              <MiniStat icon={<TrendingUp className="h-3.5 w-3.5 text-muted-foreground" />} label="Avg mentor score" value={`${avgMentorScore}/10`} />
+              <MiniStat icon={<FileText className="h-3.5 w-3.5 text-muted-foreground" />} label="Last reviewed" value={lastEval?.date ?? "—"} />
+            </div>
+            {Object.keys(evidenceTypes).length > 0 && (
+              <div className="px-5 pb-4">
+                <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-2">Evidence by type</div>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(evidenceTypes).map(([type, count]) => (
+                    <span key={type} className="inline-flex items-center gap-1.5 rounded-md border border-border bg-muted/30 px-2.5 py-1 text-xs">
+                      <span className="font-medium">{count}</span>
+                      <span className="text-muted-foreground">{type}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="px-5 pb-5">
+              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Competency snapshot</div>
+              <div className="space-y-2">
+                {COMPETENCIES.map((c) => {
+                  const v = scores[c];
+                  const t = target[c];
+                  const met = v >= t;
+                  return (
+                    <div key={c} className="flex items-center gap-3 text-xs">
+                      <span className="w-28 shrink-0 text-muted-foreground">{c}</span>
+                      <div className="relative flex-1 h-2 rounded bg-muted border border-border">
+                        <div
+                          className={`absolute inset-y-0 left-0 rounded transition-all duration-500 ${met ? "bg-[color:var(--success)]" : "bg-primary"}`}
+                          style={{ width: `${(v / 10) * 100}%` }}
+                        />
+                        <div className="absolute -top-0.5 -bottom-0.5 w-0.5 bg-foreground/30" style={{ left: `${(t / 10) * 100}%` }} />
                       </div>
-                      <div className="text-xs text-muted-foreground mt-0.5">{e.type} · {e.competencies.join(", ")}</div>
+                      <span className={`w-8 text-right font-mono ${met ? "text-[color:var(--success)]" : "text-muted-foreground"}`}>{v}/{t}</span>
+                      {c === topCompetency && <Pill tone="strong">Top</Pill>}
+                      {c === weakestCompetency && !met && <Pill tone="weak">Focus</Pill>}
                     </div>
-                    <div className="shrink-0">
-                      {d ? (
-                        <DecisionBadge decision={d} />
-                      ) : (
-                        <button
-                          onClick={() => setReviewing(e)}
-                          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-                        >
-                          <Zap className="h-3.5 w-3.5" /> Quick-validate
-                        </button>
-                      )}
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
+                  );
+                })}
+              </div>
+            </div>
           </Card>
         </div>
       </div>
-
-      {reviewing && (
-        <QuickValidate
-          evidence={reviewing}
-          onClose={() => setReviewing(null)}
-          onDecide={(d) => { setDecisions((prev) => ({ ...prev, [reviewing.id]: d })); setReviewing(null); }}
-        />
-      )}
     </>
   );
 }
 
-function Donut({ value, size = 56, label }: { value: number; size?: number; label?: string }) {
+function MiniStat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="rounded-md border border-border bg-muted/30 px-3 py-2.5">
+      <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-1">{icon}{label}</div>
+      <div className="text-sm font-semibold">{value}</div>
+    </div>
+  );
+}
+
+function Donut({ value, size = 56 }: { value: number; size?: number }) {
   const r = (size - 8) / 2;
   const c = 2 * Math.PI * r;
   const off = c - (value / 100) * c;
   const stroke = value >= 67 ? "var(--success)" : value >= 34 ? "var(--primary)" : "var(--warning)";
   return (
-    <div className="relative grid place-items-center" style={{ width: size, height: size }}>
+    <div className="relative grid place-items-center shrink-0" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--muted)" strokeWidth={4} />
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={stroke} strokeWidth={4}
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--muted)" strokeWidth={3} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={stroke} strokeWidth={3}
           strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round"
-          style={{ transition: "stroke-dashoffset 600ms var(--ease-out)" }} />
+          style={{ transition: "stroke-dashoffset 600ms" }} />
       </svg>
       <div className="absolute text-center leading-none">
-        <div className="font-semibold" style={{ fontSize: size * 0.26 }}>{value}</div>
-        {label && size >= 60 && <div className="text-[9px] text-muted-foreground mt-0.5">{label}</div>}
-      </div>
-    </div>
-  );
-}
-
-function DecisionBadge({ decision }: { decision: Decision }) {
-  const map = {
-    Confirmed: { tone: "strong" as const, icon: Check },
-    Partial: { tone: "developing" as const, icon: Minus },
-    "Needs proof": { tone: "weak" as const, icon: X },
-  };
-  const { tone, icon: Icon } = map[decision];
-  return <Pill tone={tone}><Icon className="h-3 w-3 mr-1 inline" />{decision}</Pill>;
-}
-
-function QuickValidate({ evidence, onClose, onDecide }: { evidence: Evidence; onClose: () => void; onDecide: (d: Decision) => void }) {
-  return (
-    <div
-      className="fixed inset-0 z-50 grid place-items-center bg-foreground/40 p-4"
-      onClick={onClose}
-      style={{ animation: "cgt-rise 0.18s var(--ease-out)" }}
-    >
-      <div
-        role="dialog" aria-modal="true" aria-label="Quick validate claim"
-        onClick={(e) => e.stopPropagation()}
-        className="w-[480px] max-w-full rounded-xl border border-border bg-popover p-5 shadow-xl origin-center"
-        style={{ animation: "cgt-rise 0.2s var(--ease-out)" }}
-      >
-        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-          <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5" /> Step 2 of 3 · review claim</span>
-        </div>
-        <div className="mt-2 flex gap-1.5">
-          <span className="h-1.5 flex-1 rounded-full bg-primary" />
-          <span className="h-1.5 flex-1 rounded-full bg-primary" />
-          <span className="h-1.5 flex-1 rounded-full bg-muted" />
-        </div>
-
-        <div className="mt-4 rounded-lg border border-border bg-muted/40 p-3">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Claim</div>
-          <div className="text-sm font-medium mt-0.5">{evidence.title}</div>
-          <p className="text-xs text-muted-foreground mt-1">{evidence.description}</p>
-        </div>
-        <div className="mt-2 rounded-lg border border-border bg-muted/40 p-3">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Maps to</div>
-          <div className="mt-1 flex flex-wrap gap-1.5">
-            {evidence.competencies.map((c) => (<Pill key={c}>{c}</Pill>))}
-          </div>
-        </div>
-
-        <div className="mt-4 grid grid-cols-3 gap-2">
-          <button onClick={() => onDecide("Confirmed")}
-            className="inline-flex items-center justify-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-            <Check className="h-4 w-4" /> Confirm
-          </button>
-          <button onClick={() => onDecide("Partial")}
-            className="inline-flex items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 py-2 text-sm font-medium hover:bg-accent">
-            <Minus className="h-4 w-4" /> Partial
-          </button>
-          <button onClick={() => onDecide("Needs proof")}
-            className="inline-flex items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 py-2 text-sm font-medium hover:bg-accent">
-            <X className="h-4 w-4" /> Needs proof
-          </button>
-        </div>
-        <div className="mt-3 flex items-center justify-between">
-          <button onClick={onClose} className="rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent">Cancel</button>
-          <span className="text-xs text-muted-foreground">Plain words mirror a real mentor's judgement.</span>
-        </div>
+        <div className="font-semibold" style={{ fontSize: size * 0.28 }}>{value}</div>
       </div>
     </div>
   );

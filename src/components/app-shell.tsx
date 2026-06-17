@@ -1,11 +1,13 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   LayoutDashboard, Target, FileText, TrendingUp, GraduationCap,
-  Users, ClipboardCheck, ShieldCheck, Compass, GitCompare,
+  Users, ClipboardCheck, ShieldCheck, Compass, GitCompare, LogOut, UserCircle,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useStudent } from "@/lib/student-context";
-import { useRole, type Role } from "@/lib/role-context";
-import { students } from "@/lib/mock-data";
+import { useRole } from "@/lib/role-context";
+import { recruiters } from "@/lib/mock-data";
+import { ConfirmDialog } from "@/components/ui";
 import type { ReactNode } from "react";
 
 const studentNav = [
@@ -14,29 +16,67 @@ const studentNav = [
   { to: "/evidence", label: "Evidence", icon: FileText },
   { to: "/self-check", label: "Self-check", icon: Compass },
   { to: "/timeline", label: "Progression", icon: TrendingUp },
+  { to: "/profile", label: "My Profile", icon: UserCircle },
 ] as const;
 
 const recruiterNav = [
   { to: "/recruiter", label: "Candidates", icon: Users },
   { to: "/mentor", label: "Validate claims", icon: ClipboardCheck },
   { to: "/career", label: "Role benchmarks", icon: GitCompare },
+  { to: "/profile", label: "My Profile", icon: UserCircle },
 ] as const;
+
+const PAGE_LABELS: Record<string, string> = {
+  "/": "Dashboard",
+  "/career": "Career Target",
+  "/evidence": "Evidence",
+  "/self-check": "Self-Check",
+  "/timeline": "Progression",
+  "/profile": "My Profile",
+  "/recruiter": "Candidates",
+  "/mentor": "Review",
+};
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
   const { studentId, setStudentId, student } = useStudent();
-  const { role, setRole } = useRole();
+  const { role, isLoggedIn, personId, registeredUsers, logout } = useRole();
   const navigate = useNavigate();
   const nav = role === "recruiter" ? recruiterNav : studentNav;
+  const pageLabel = PAGE_LABELS[pathname] ?? "";
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-  const switchRole = (r: Role) => {
-    if (r === role) return;
-    setRole(r);
-    navigate({ to: r === "recruiter" ? "/recruiter" : "/" });
+  useEffect(() => {
+    if (!isLoggedIn && pathname !== "/login" && pathname !== "/signup") {
+      navigate({ to: "/login" });
+    }
+  }, [isLoggedIn, pathname, navigate]);
+
+  useEffect(() => {
+    if (role === "student" && personId) {
+      setStudentId(personId);
+    }
+  }, [role, personId, setStudentId]);
+
+  const handleLogout = () => {
+    setShowLogoutConfirm(false);
+    logout();
+    navigate({ to: "/login" });
   };
+
+  if (!isLoggedIn) return <>{children}</>;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {showLogoutConfirm && (
+        <ConfirmDialog
+          title="Sign out?"
+          description="You will be returned to the login screen. Any unsaved changes in this session will be lost."
+          confirmLabel="Yes, sign out"
+          onConfirm={handleLogout}
+          onCancel={() => setShowLogoutConfirm(false)}
+        />
+      )}
       <div className="flex">
         <aside className="hidden md:flex w-64 shrink-0 flex-col border-r border-border bg-card sticky top-0 h-screen">
           <div className="px-5 py-5 border-b border-border">
@@ -49,7 +89,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <div className="text-xs text-muted-foreground">Gap Tracker</div>
               </div>
             </div>
-            <RoleSwitch role={role} onChange={switchRole} className="mt-4" />
           </div>
 
           <nav className="flex-1 px-3 py-4 space-y-0.5">
@@ -76,39 +115,73 @@ export function AppShell({ children }: { children: ReactNode }) {
 
           <div className="px-4 py-4 border-t border-border">
             {role === "student" ? (
-              <>
-                <label className="text-[10px] text-muted-foreground uppercase tracking-wider">Viewing as</label>
-                <select
-                  value={studentId}
-                  onChange={(e) => setStudentId(e.target.value)}
-                  className="mt-1.5 w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                >
-                  {students.map((s) => (<option key={s.id} value={s.id}>{s.name}</option>))}
-                </select>
-                <div className="mt-2 text-xs text-muted-foreground">{student.program}</div>
-              </>
-            ) : (
               <div className="flex items-center gap-2.5">
-                <div className="h-8 w-8 rounded-full bg-accent grid place-items-center text-accent-foreground">
-                  <ShieldCheck className="h-4 w-4" />
+                <div className="h-8 w-8 rounded-full bg-accent grid place-items-center text-accent-foreground shrink-0">
+                  <UserCircle className="h-4 w-4" />
                 </div>
-                <div className="leading-tight">
-                  <div className="text-sm font-medium">Samuel Marc</div>
-                  <div className="text-xs text-muted-foreground">Recruiter · Zurich Services</div>
+                <div className="leading-tight min-w-0">
+                  <div className="text-sm font-medium truncate">{student.name}</div>
+                  <div className="text-xs text-muted-foreground truncate">{student.program.replace(", Final Year", "")}</div>
                 </div>
               </div>
+            ) : (
+              (() => {
+                const mockRec = recruiters.find((r) => r.id === personId);
+                const regRec = !mockRec ? registeredUsers.find((u) => u.id === personId && u.role === "recruiter") : null;
+                const name = mockRec?.name ?? regRec?.name ?? "Recruiter";
+                const subtitle = mockRec
+                  ? `${mockRec.title} · ${mockRec.company}`
+                  : regRec
+                  ? `${regRec.title ?? "Recruiter"} · ${regRec.company ?? ""}`
+                  : "";
+                return (
+                  <div className="flex items-center gap-2.5">
+                    <div className="h-8 w-8 rounded-full bg-accent grid place-items-center text-accent-foreground">
+                      <ShieldCheck className="h-4 w-4" />
+                    </div>
+                    <div className="leading-tight">
+                      <div className="text-sm font-medium">{name}</div>
+                      <div className="text-xs text-muted-foreground">{subtitle}</div>
+                    </div>
+                  </div>
+                );
+              })()
             )}
+            <button
+              onClick={() => setShowLogoutConfirm(true)}
+              className="mt-3 w-full flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              Sign out
+            </button>
           </div>
         </aside>
 
-        <main className="flex-1 min-w-0">
+        <main className="flex-1 min-w-0 flex flex-col">
+          {/* Desktop page-label bar */}
+          <div className="hidden md:flex items-center justify-between border-b border-border/70 bg-card/50 px-10 py-2.5 shrink-0">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
+              <GraduationCap className="h-3.5 w-3.5 text-primary/60" />
+              <span>Competency Gap Tracker</span>
+            </div>
+            {pageLabel && (
+              <span className="text-[11px] font-extrabold uppercase tracking-[0.3em] text-foreground/25 select-none">
+                {pageLabel}
+              </span>
+            )}
+          </div>
+
           {/* Mobile top bar */}
-          <div className="md:hidden border-b border-border bg-card px-4 py-3 flex items-center justify-between gap-3">
+          <div className="md:hidden border-b border-border bg-card px-4 py-3 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <GraduationCap className="h-4 w-4 text-primary" />
               <span className="text-sm font-semibold">Competency Tracker</span>
             </div>
-            <RoleSwitch role={role} onChange={switchRole} compact />
+            {pageLabel && (
+              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
+                {pageLabel}
+              </span>
+            )}
           </div>
           <div className="md:hidden border-b border-border bg-card px-2 py-2 flex gap-1 overflow-x-auto">
             {nav.map((n) => {
@@ -120,36 +193,11 @@ export function AppShell({ children }: { children: ReactNode }) {
               );
             })}
           </div>
-          <div className="px-6 md:px-10 py-8 max-w-6xl mx-auto">{children}</div>
+
+          <div className="px-6 md:px-10 py-8 max-w-6xl mx-auto w-full">{children}</div>
         </main>
       </div>
     </div>
   );
 }
 
-function RoleSwitch({ role, onChange, compact = false, className = "" }: { role: Role; onChange: (r: Role) => void; compact?: boolean; className?: string }) {
-  return (
-    <div
-      role="tablist"
-      aria-label="Switch perspective"
-      className={`relative grid grid-cols-2 gap-1 rounded-lg border border-border bg-muted/60 p-1 ${className}`}
-    >
-      {(["student", "recruiter"] as const).map((r) => {
-        const active = role === r;
-        return (
-          <button
-            key={r}
-            role="tab"
-            aria-selected={active}
-            onClick={() => onChange(r)}
-            className={`relative z-10 rounded-md font-medium capitalize transition-colors ${compact ? "px-3 py-1 text-xs" : "px-2.5 py-1.5 text-[13px]"} ${
-              active ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {r}
-          </button>
-        );
-      })}
-    </div>
-  );
-}

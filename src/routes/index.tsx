@@ -5,6 +5,7 @@ import { useStudent } from "@/lib/student-context";
 import { COMPETENCIES, careerTargets, evaluations, evidence, latestScores, readinessScore, strengthsWeaknesses, tier } from "@/lib/mock-data";
 import { Card, CardHeader, PageHeader } from "@/components/page-header";
 import { Pill, StatusBadge } from "@/components/badges";
+import { InfoIcon, ScoreLegend } from "@/components/ui";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title: "Dashboard — Competency Tracker" }] }),
@@ -19,11 +20,20 @@ function Dashboard() {
   const evals = evaluations.filter((e) => e.studentId === student.id);
   const evs = evidence.filter((e) => e.studentId === student.id);
   const approved = evs.filter((e) => e.status === "Approved").length;
+  const pending = evs.filter((e) => e.status === "Pending").length;
 
-  const radarData = COMPETENCIES.map((c) => ({ competency: c, score: scores[c], full: 5 }));
+  const radarData = COMPETENCIES.map((c) => ({ competency: c, score: scores[c], full: 10 }));
 
   const target = careerTargets["Software Engineer"];
-  const gaps = COMPETENCIES.filter((c) => scores[c] < target[c]).sort((a, b) => (scores[a] - target[a]) - (scores[b] - target[b]));
+  const gaps = COMPETENCIES.filter((c) => scores[c] < target[c]).sort(
+    (a, b) => scores[a] - target[a] - (scores[b] - target[b]),
+  );
+
+  const roleReadinessData = Object.entries(careerTargets).map(([roleName, rt]) => {
+    const matched = COMPETENCIES.filter((c) => scores[c] >= rt[c]).length;
+    return { role: roleName, coverage: Math.round((matched / COMPETENCIES.length) * 100) };
+  });
+  const bestRole = [...roleReadinessData].sort((a, b) => b.coverage - a.coverage)[0];
 
   return (
     <>
@@ -40,30 +50,69 @@ function Dashboard() {
             <span className="text-muted-foreground">
               {gaps.slice(0, 2).map((c) => `${c} is ${scores[c]}/${target[c]} for Software Engineer`).join("; ")}. Add targeted evidence to close the gap.
             </span>{" "}
-            <Link to="/career" className="font-medium text-primary hover:underline whitespace-nowrap">Review target →</Link>
+            <Link to="/career" className="font-medium text-primary hover:underline whitespace-nowrap">
+              Review target →
+            </Link>
           </div>
         </div>
       )}
 
-      <div className="cgt-rise grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Stat label="Career Readiness" value={`${score}%`} hint="Composite of latest mentor scores" />
-        <Stat label="Evaluations" value={String(evals.length)} hint={`Across ${new Set(evals.map((e) => e.mentorId)).size} mentors`} />
+      <div className="cgt-rise grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+        <Stat
+          label="Career Readiness"
+          value={`${score}%`}
+          hint="Average of all competency scores (1–10)"
+          tip="Calculated as the average of all 6 mentor-validated competency scores (1–10 each), expressed as a percentage of the maximum. Higher = stronger overall profile."
+        />
+        <Stat
+          label="Evaluations"
+          value={String(evals.length)}
+          hint={`Across ${new Set(evals.map((e) => e.mentorId)).size} mentors`}
+        />
         <Stat label="Evidence Approved" value={`${approved}/${evs.length}`} hint="Validated submissions" />
-        <Stat label="Last Reviewed" value={evals.at(-1)?.date ?? "—"} hint="Most recent mentor entry" />
+        <Stat label="Pending Review" value={String(pending)} hint="Awaiting mentor validation" />
+        <Stat
+          label="Best role fit"
+          value={`${bestRole.coverage}%`}
+          hint={bestRole.role}
+          tip="The career role where the most competency requirements are already met based on your latest mentor scores."
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card className="lg:col-span-2">
-          <CardHeader title="Competency Profile" description="Latest aggregated mentor scores (1–5 scale)" />
+          <CardHeader title="Competency Profile" description="Latest aggregated mentor scores (1–10 scale)" />
+          <div className="px-5 py-2.5 border-b border-border/50 bg-muted/20">
+            <ScoreLegend />
+          </div>
           <div className="p-5">
-            <div className="h-[340px]">
+            <div className="h-[310px]">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={radarData} outerRadius="75%">
                   <PolarGrid stroke="oklch(0.92 0.006 250)" />
                   <PolarAngleAxis dataKey="competency" tick={{ fill: "oklch(0.4 0.02 260)", fontSize: 12 }} />
-                  <PolarRadiusAxis angle={90} domain={[0, 5]} tick={{ fill: "oklch(0.6 0.02 260)", fontSize: 10 }} tickCount={6} />
-                  <Radar name="Score" dataKey="score" stroke="oklch(0.45 0.09 250)" fill="oklch(0.45 0.09 250)" fillOpacity={0.18} strokeWidth={2} />
-                  <Tooltip contentStyle={{ background: "white", border: "1px solid oklch(0.92 0.006 250)", borderRadius: 6, fontSize: 12 }} />
+                  <PolarRadiusAxis
+                    angle={90}
+                    domain={[0, 10]}
+                    tick={{ fill: "oklch(0.6 0.02 260)", fontSize: 10 }}
+                    tickCount={6}
+                  />
+                  <Radar
+                    name="Score"
+                    dataKey="score"
+                    stroke="oklch(0.45 0.09 250)"
+                    fill="oklch(0.45 0.09 250)"
+                    fillOpacity={0.18}
+                    strokeWidth={2}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      background: "white",
+                      border: "1px solid oklch(0.92 0.006 250)",
+                      borderRadius: 6,
+                      fontSize: 12,
+                    }}
+                  />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
@@ -75,25 +124,70 @@ function Dashboard() {
           <div className="p-5 space-y-5">
             <Section icon={<TrendingUp className="h-3.5 w-3.5 text-[color:var(--success)]" />} label="Strengths">
               {strengths.map((c) => (
-                <Pill key={c} tone="strong">{c} · {scores[c]}/5</Pill>
+                <Pill key={c} tone="strong">
+                  {c} · {scores[c]}/10
+                </Pill>
               ))}
             </Section>
-            <Section icon={<TrendingDown className="h-3.5 w-3.5 text-destructive" />} label="Improvement areas">
+            <Section
+              icon={<TrendingDown className="h-3.5 w-3.5 text-destructive" />}
+              label="Improvement areas"
+            >
               {weaknesses.map((c) => (
-                <Pill key={c} tone={tier(scores[c])}>{c} · {scores[c]}/5</Pill>
+                <Pill key={c} tone={tier(scores[c])}>
+                  {c} · {scores[c]}/10
+                </Pill>
               ))}
             </Section>
             <div className="pt-4 border-t border-border text-xs text-muted-foreground leading-relaxed">
               {generateInsight(scores)}
             </div>
-            <Link to="/career" className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+            <Link
+              to="/career"
+              className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            >
               Compare against career target <ArrowUpRight className="h-3 w-3" />
             </Link>
           </div>
         </Card>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader
+            title="Role Readiness"
+            description="Requirements met vs each career path target"
+          />
+          <div className="p-5 space-y-4">
+            {roleReadinessData.map(({ role, coverage }) => (
+              <div key={role} className="flex items-center gap-3">
+                <span className="w-28 shrink-0 text-xs text-muted-foreground">{role}</span>
+                <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-700"
+                    style={{
+                      width: `${coverage}%`,
+                      background:
+                        coverage >= 80
+                          ? "var(--success)"
+                          : coverage >= 50
+                          ? "oklch(0.45 0.09 250)"
+                          : "var(--warning)",
+                    }}
+                  />
+                </div>
+                <span className="text-xs font-mono text-muted-foreground w-10 text-right">{coverage}%</span>
+              </div>
+            ))}
+            <Link
+              to="/career"
+              className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            >
+              Full role analysis <ArrowUpRight className="h-3 w-3" />
+            </Link>
+          </div>
+        </Card>
+
         <Card>
           <CardHeader title="Recent Evidence" description="Submissions mapped to competencies" />
           <ul className="divide-y divide-border">
@@ -101,13 +195,16 @@ function Dashboard() {
               <li key={e.id} className="px-5 py-3 flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="text-sm font-medium truncate">{e.title}</div>
-                  <div className="text-xs text-muted-foreground">{e.type} · {e.submittedAt}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {e.type} · {e.submittedAt}
+                  </div>
                 </div>
                 <StatusBadge status={e.status} />
               </li>
             ))}
           </ul>
         </Card>
+
         <Card>
           <CardHeader title="Recent Mentor Notes" description="Qualitative feedback" />
           <ul className="divide-y divide-border">
@@ -124,21 +221,33 @@ function Dashboard() {
   );
 }
 
-function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
+function Stat({ label, value, hint, tip }: { label: string; value: string; hint?: string; tip?: string }) {
   return (
     <div className="rounded-lg border border-border bg-card px-5 py-4">
-      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        {label}
+        {tip && <InfoIcon tip={tip} />}
+      </div>
       <div className="mt-1 text-2xl font-semibold tracking-tight">{value}</div>
       {hint ? <div className="text-xs text-muted-foreground mt-0.5">{hint}</div> : null}
     </div>
   );
 }
 
-function Section({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
+function Section({
+  icon,
+  label,
+  children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <div className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-muted-foreground mb-2">
-        {icon}{label}
+        {icon}
+        {label}
       </div>
       <div className="flex flex-wrap gap-1.5">{children}</div>
     </div>
@@ -146,11 +255,21 @@ function Section({ icon, label, children }: { icon: React.ReactNode; label: stri
 }
 
 function generateInsight(scores: Record<string, number>): string {
-  const weak = Object.entries(scores).filter(([, v]) => v <= 2).map(([k]) => k);
-  const strong = Object.entries(scores).filter(([, v]) => v >= 4).map(([k]) => k);
+  const weak = Object.entries(scores)
+    .filter(([, v]) => v <= 4)
+    .map(([k]) => k);
+  const strong = Object.entries(scores)
+    .filter(([, v]) => v >= 8)
+    .map(([k]) => k);
   const parts: string[] = [];
   if (strong.length) parts.push(`Demonstrates consistent strength in ${strong.join(", ")}.`);
-  if (weak.length) parts.push(`Recommended focus: ${weak.join(", ")} — submit further evidence or seek mentor sessions.`);
-  if (!weak.length && !strong.length) parts.push("Profile is broadly developing; continue gathering evidence across all competencies.");
+  if (weak.length)
+    parts.push(
+      `Recommended focus: ${weak.join(", ")} — submit further evidence or seek mentor sessions.`,
+    );
+  if (!weak.length && !strong.length)
+    parts.push(
+      "Profile is broadly developing; continue gathering evidence across all competencies.",
+    );
   return parts.join(" ");
 }
