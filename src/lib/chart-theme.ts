@@ -10,7 +10,7 @@ export interface ChartTheme {
   /* one colour per competency, in COMPETENCIES order */
   series: string[];
   primary: string;
-  target: string;       // muted "role target" series
+  target: string; // muted "role target" series
   success: string;
   warning: string;
   destructive: string;
@@ -30,10 +30,10 @@ const LIGHT: ChartTheme = {
   series: [
     "oklch(0.545 0.205 275)", // indigo
     "oklch(0.585 0.205 305)", // violet
-    "oklch(0.66 0.13 215)",   // cyan
-    "oklch(0.62 0.15 155)",   // emerald
-    "oklch(0.76 0.15 70)",    // amber
-    "oklch(0.62 0.205 12)",   // rose
+    "oklch(0.66 0.13 215)", // cyan
+    "oklch(0.62 0.15 155)", // emerald
+    "oklch(0.76 0.15 70)", // amber
+    "oklch(0.62 0.205 12)", // rose
   ],
   primary: "oklch(0.515 0.214 275)",
   target: "oklch(0.80 0.04 275)",

@@ -32,13 +32,19 @@ export function ThemeToggle({ variant = "full" }: { variant?: "full" | "icon" })
       aria-label="Toggle dark mode"
       className="group flex w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
     >
-      <span className="relative inline-flex h-4.5 w-8 shrink-0 items-center rounded-full bg-muted transition-colors group-hover:bg-border"
-            style={{ height: "1.05rem" }}>
+      <span
+        className="relative inline-flex w-8 shrink-0 items-center rounded-full bg-muted transition-colors group-hover:bg-border"
+        style={{ height: "1.05rem" }}
+      >
         <span
           className="inline-flex h-3.5 w-3.5 translate-x-0.5 items-center justify-center rounded-full bg-card shadow-sm transition-transform"
           style={{ transform: isDark ? "translateX(0.875rem)" : "translateX(0.125rem)" }}
         >
-          {isDark ? <Moon className="h-2.5 w-2.5 text-primary" /> : <Sun className="h-2.5 w-2.5 text-warning" />}
+          {isDark ? (
+            <Moon className="h-2.5 w-2.5 text-primary" />
+          ) : (
+            <Sun className="h-2.5 w-2.5 text-warning" />
+          )}
         </span>
       </span>
       {isDark ? "Dark mode" : "Light mode"}

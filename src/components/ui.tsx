@@ -154,7 +154,9 @@ export function ConfirmDialog({
         aria-labelledby="confirm-dialog-title"
         className="relative z-10 bg-card rounded-xl border border-border shadow-2xl w-full max-w-sm p-6"
       >
-        <h2 id="confirm-dialog-title" className="text-base font-semibold">{title}</h2>
+        <h2 id="confirm-dialog-title" className="text-base font-semibold">
+          {title}
+        </h2>
         {description && (
           <p className="text-sm text-muted-foreground leading-relaxed mt-2">{description}</p>
         )}

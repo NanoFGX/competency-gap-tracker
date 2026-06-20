@@ -1,7 +1,18 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
-  LayoutDashboard, Target, FileText, TrendingUp, GraduationCap,
-  Users, ClipboardCheck, ShieldCheck, Compass, GitCompare, LogOut, UserCircle, Palette,
+  LayoutDashboard,
+  Target,
+  FileText,
+  TrendingUp,
+  GraduationCap,
+  Users,
+  ClipboardCheck,
+  ShieldCheck,
+  Compass,
+  GitCompare,
+  LogOut,
+  UserCircle,
+  Palette,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useStudent } from "@/lib/student-context";
@@ -125,7 +136,9 @@ export function AppShell({ children }: { children: ReactNode }) {
                   {active && (
                     <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-primary" />
                   )}
-                  <Icon className={`h-4 w-4 transition-colors ${active ? "text-primary" : "text-muted-foreground group-hover:text-foreground"}`} />
+                  <Icon
+                    className={`h-4 w-4 transition-colors ${active ? "text-primary" : "text-muted-foreground group-hover:text-foreground"}`}
+                  />
                   {n.label}
                 </Link>
               );
@@ -145,7 +158,9 @@ export function AppShell({ children }: { children: ReactNode }) {
               {isActive(pathname, "/design-system") && (
                 <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-primary" />
               )}
-              <Palette className={`h-4 w-4 transition-colors ${isActive(pathname, "/design-system") ? "text-primary" : "text-muted-foreground group-hover:text-foreground"}`} />
+              <Palette
+                className={`h-4 w-4 transition-colors ${isActive(pathname, "/design-system") ? "text-primary" : "text-muted-foreground group-hover:text-foreground"}`}
+              />
               Design system
             </Link>
           </nav>
@@ -158,19 +173,23 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </div>
                 <div className="min-w-0 leading-tight">
                   <div className="truncate text-sm font-medium">{student.name}</div>
-                  <div className="truncate text-xs text-muted-foreground">{student.program.replace(", Final Year", "")}</div>
+                  <div className="truncate text-xs text-muted-foreground">
+                    {student.program.replace(", Final Year", "")}
+                  </div>
                 </div>
               </div>
             ) : (
               (() => {
                 const mockRec = recruiters.find((r) => r.id === personId);
-                const regRec = !mockRec ? registeredUsers.find((u) => u.id === personId && u.role === "recruiter") : null;
+                const regRec = !mockRec
+                  ? registeredUsers.find((u) => u.id === personId && u.role === "recruiter")
+                  : null;
                 const name = mockRec?.name ?? regRec?.name ?? "Recruiter";
                 const subtitle = mockRec
                   ? `${mockRec.title} · ${mockRec.company}`
                   : regRec
-                  ? `${regRec.title ?? "Recruiter"} · ${regRec.company ?? ""}`
-                  : "";
+                    ? `${regRec.title ?? "Recruiter"} · ${regRec.company ?? ""}`
+                    : "";
                 return (
                   <div className="flex items-center gap-2.5">
                     <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent text-accent-foreground">

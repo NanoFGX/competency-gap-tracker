@@ -77,9 +77,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Competency Gap Tracker" },
-      { name: "description", content: "Track, evaluate, and visualize professional competencies for final-year Computer Science students." },
+      {
+        name: "description",
+        content:
+          "Track, evaluate, and visualize professional competencies for final-year Computer Science students.",
+      },
       { property: "og:title", content: "Competency Gap Tracker" },
-      { property: "og:description", content: "Evidence-based competency profiles and gap analysis for CS students and lecturers." },
+      {
+        property: "og:description",
+        content:
+          "Evidence-based competency profiles and gap analysis for CS students and lecturers.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },

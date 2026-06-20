@@ -25,17 +25,29 @@ import {
 } from "@/lib/mock-data";
 import { Card, CardHeader, PageHeader } from "@/components/page-header";
 import { Pill } from "@/components/badges";
+import { useChartTheme } from "@/lib/chart-theme";
 
 export const Route = createFileRoute("/timeline")({
   head: () => ({ meta: [{ title: "Progression — Competency Tracker" }] }),
   component: TimelinePage,
 });
 
-const CHART_COLORS = ["#3b82f6", "#8b5cf6", "#06b6d4", "#10b981", "#f59e0b", "#ef4444"];
-
 function fmtDate(d: string) {
   const [y, m] = d.split("-");
-  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const MONTHS = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   return `${MONTHS[parseInt(m) - 1]} '${y.slice(2)}`;
 }
 
@@ -80,6 +92,8 @@ const AI_INSIGHTS: Record<
 
 function TimelinePage() {
   const { student } = useStudent();
+  const chart = useChartTheme();
+  const CHART_COLORS = chart.series;
 
   const evals = evaluations
     .filter((e) => e.studentId === student.id)
@@ -92,6 +106,8 @@ function TimelinePage() {
     return (
       <>
         <PageHeader
+          eyebrow="Student"
+          icon={<TrendingUpIcon className="h-5 w-5" />}
           title="Progression Timeline"
           description="Track competency improvements over time, derived from mentor evaluations and validated evidence."
         />
@@ -133,6 +149,8 @@ function TimelinePage() {
   return (
     <>
       <PageHeader
+        eyebrow="Student"
+        icon={<TrendingUpIcon className="h-5 w-5" />}
         title="Progression Timeline"
         description="Track competency improvements over time, derived from mentor evaluations and validated evidence."
       />
@@ -172,29 +190,21 @@ function TimelinePage() {
         <div className="p-5 h-[380px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 10, right: 20, left: -16, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.93 0.006 250)" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} vertical={false} />
               <XAxis
                 dataKey="date"
-                tick={{ fontSize: 11, fill: "oklch(0.45 0.02 260)" }}
+                tick={{ fontSize: 11, fill: chart.axis }}
                 tickLine={false}
-                axisLine={{ stroke: "oklch(0.90 0.006 250)" }}
+                axisLine={{ stroke: chart.grid }}
               />
               <YAxis
                 domain={[0, 10]}
                 ticks={[0, 2, 4, 6, 8, 10]}
-                tick={{ fontSize: 11, fill: "oklch(0.45 0.02 260)" }}
+                tick={{ fontSize: 11, fill: chart.axis }}
                 tickLine={false}
                 axisLine={false}
               />
-              <Tooltip
-                contentStyle={{
-                  background: "white",
-                  border: "1px solid oklch(0.92 0.006 250)",
-                  borderRadius: 8,
-                  fontSize: 12,
-                  boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-                }}
-              />
+              <Tooltip contentStyle={chart.tooltip} />
               <Legend wrapperStyle={{ fontSize: 11, paddingTop: 12 }} />
               {COMPETENCIES.map((c, i) => (
                 <Line
@@ -203,7 +213,7 @@ function TimelinePage() {
                   dataKey={c}
                   stroke={CHART_COLORS[i]}
                   strokeWidth={2}
-                  dot={{ r: 4, fill: "#fff", strokeWidth: 2 }}
+                  dot={{ r: 4, fill: chart.tooltip.background, strokeWidth: 2 }}
                   activeDot={{ r: 5, strokeWidth: 0 }}
                 />
               ))}
@@ -218,7 +228,9 @@ function TimelinePage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {perRoleStats.map(({ role, coverage, matched }) => (
             <div key={role} className="rounded-lg border border-border bg-card px-4 py-3">
-              <div className="text-xs text-muted-foreground mb-1.5 font-medium truncate">{role}</div>
+              <div className="text-xs text-muted-foreground mb-1.5 font-medium truncate">
+                {role}
+              </div>
               <div className="text-2xl font-semibold tracking-tight">{coverage}%</div>
               <div className="text-xs text-muted-foreground mb-2">
                 {matched}/{COMPETENCIES.length} requirements met
@@ -232,8 +244,8 @@ function TimelinePage() {
                       coverage >= 80
                         ? "var(--success)"
                         : coverage >= 50
-                        ? "oklch(0.45 0.09 250)"
-                        : "var(--warning)",
+                          ? "var(--primary)"
+                          : "var(--warning)",
                   }}
                 />
               </div>
@@ -254,53 +266,52 @@ function TimelinePage() {
               <AreaChart data={chartData} margin={{ top: 10, right: 20, left: -16, bottom: 0 }}>
                 <defs>
                   <linearGradient id="readinessGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="oklch(0.45 0.09 250)" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="oklch(0.45 0.09 250)" stopOpacity={0} />
+                    <stop offset="5%" stopColor={chart.primary} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={chart.primary} stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.93 0.006 250)" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} vertical={false} />
                 <XAxis
                   dataKey="date"
-                  tick={{ fontSize: 11, fill: "oklch(0.45 0.02 260)" }}
+                  tick={{ fontSize: 11, fill: chart.axis }}
                   tickLine={false}
-                  axisLine={{ stroke: "oklch(0.90 0.006 250)" }}
+                  axisLine={{ stroke: chart.grid }}
                 />
                 <YAxis
                   domain={[0, 100]}
                   ticks={[0, 25, 50, 75, 100]}
-                  tick={{ fontSize: 11, fill: "oklch(0.45 0.02 260)" }}
+                  tick={{ fontSize: 11, fill: chart.axis }}
                   tickLine={false}
                   axisLine={false}
                 />
                 <Tooltip
-                  contentStyle={{
-                    background: "white",
-                    border: "1px solid oklch(0.92 0.006 250)",
-                    borderRadius: 8,
-                    fontSize: 12,
-                    boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-                  }}
+                  contentStyle={chart.tooltip}
                   formatter={(v: number) => [`${v}%`, "Readiness"]}
                 />
                 <ReferenceLine
                   y={70}
-                  stroke="oklch(0.55 0.15 25)"
+                  stroke={chart.warning}
                   strokeDasharray="4 3"
                   label={{
                     value: "Career-ready goal (70%)",
                     position: "insideTopRight",
                     fontSize: 10,
-                    fill: "oklch(0.55 0.15 25)",
+                    fill: chart.warning,
                   }}
                 />
                 <Area
                   type="monotone"
                   dataKey="readiness"
-                  stroke="oklch(0.45 0.09 250)"
+                  stroke={chart.primary}
                   fill="url(#readinessGrad)"
                   strokeWidth={2.5}
-                  dot={{ r: 4, fill: "#fff", strokeWidth: 2.5, stroke: "oklch(0.45 0.09 250)" }}
-                  activeDot={{ r: 6, strokeWidth: 0, fill: "oklch(0.45 0.09 250)" }}
+                  dot={{
+                    r: 4,
+                    fill: chart.tooltip.background,
+                    strokeWidth: 2.5,
+                    stroke: chart.primary,
+                  }}
+                  activeDot={{ r: 6, strokeWidth: 0, fill: chart.primary }}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -322,8 +333,8 @@ function TimelinePage() {
                 t === "strong"
                   ? "bg-[color:var(--success)]"
                   : t === "weak"
-                  ? "bg-destructive/70"
-                  : "bg-primary/70";
+                    ? "bg-destructive/70"
+                    : "bg-primary/70";
               return (
                 <li key={c} className="flex items-center justify-between text-sm">
                   <span className="flex items-center gap-2">
@@ -339,8 +350,8 @@ function TimelinePage() {
                         delta > 0
                           ? "text-[color:var(--success)]"
                           : delta < 0
-                          ? "text-destructive"
-                          : "text-muted-foreground"
+                            ? "text-destructive"
+                            : "text-muted-foreground"
                       }`}
                     >
                       {delta > 0 ? "+" : ""}
@@ -382,8 +393,8 @@ function TimelinePage() {
                   t === "strong"
                     ? "var(--success)"
                     : t === "weak"
-                    ? "oklch(0.65 0.15 25)"
-                    : "oklch(0.45 0.09 250)";
+                      ? "var(--destructive)"
+                      : "var(--primary)";
                 return (
                   <tr key={c} className="hover:bg-muted/30 transition-colors">
                     <td className="px-5 py-3 font-medium">{c}</td>
@@ -399,8 +410,8 @@ function TimelinePage() {
                           delta > 0
                             ? "text-[color:var(--success)]"
                             : delta < 0
-                            ? "text-destructive"
-                            : "text-muted-foreground"
+                              ? "text-destructive"
+                              : "text-muted-foreground"
                         }`}
                       >
                         {delta > 0 ? "+" : ""}
@@ -462,7 +473,7 @@ function TimelinePage() {
               </div>
             </div>
 
-            <div className="rounded-lg bg-[color:oklch(0.65_0.1_155)]/8 border border-[color:oklch(0.65_0.1_155)]/25 p-3 flex items-start gap-2.5">
+            <div className="rounded-lg bg-success/10 border border-success/25 p-3 flex items-start gap-2.5">
               <Target className="h-4 w-4 text-[color:var(--success)] shrink-0 mt-0.5" />
               <div>
                 <div className="text-xs font-semibold text-[color:var(--success)] mb-0.5">
@@ -490,11 +501,7 @@ function StatBox({
   tone?: "strong" | "developing" | "weak";
 }) {
   const valueColor =
-    tone === "strong"
-      ? "text-[color:var(--success)]"
-      : tone === "weak"
-      ? "text-destructive"
-      : "";
+    tone === "strong" ? "text-[color:var(--success)]" : tone === "weak" ? "text-destructive" : "";
   return (
     <div className="rounded-lg border border-border bg-card px-4 py-4">
       <div className="text-xs text-muted-foreground">{label}</div>

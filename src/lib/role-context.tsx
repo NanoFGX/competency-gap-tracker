@@ -17,12 +17,12 @@ export interface RegisteredUser {
 
 // Demo accounts — same emails/passwords as CREDENTIALS.txt
 const DEMO_CREDENTIALS: Record<string, { password: string; role: Role; id: string }> = {
-  "aisha.r@university.edu":     { password: "Student@123",   role: "student",   id: "s1" },
-  "marcus.c@university.edu":    { password: "Student@123",   role: "student",   id: "s2" },
-  "priya.s@university.edu":     { password: "Student@123",   role: "student",   id: "s3" },
-  "s.marc@zurichservices.com":  { password: "Recruiter@123", role: "recruiter", id: "r1" },
+  "aisha.r@university.edu": { password: "Student@123", role: "student", id: "s1" },
+  "marcus.c@university.edu": { password: "Student@123", role: "student", id: "s2" },
+  "priya.s@university.edu": { password: "Student@123", role: "student", id: "s3" },
+  "s.marc@zurichservices.com": { password: "Recruiter@123", role: "recruiter", id: "r1" },
   "s.mitchell@axiomdigital.io": { password: "Recruiter@123", role: "recruiter", id: "r2" },
-  "j.okafor@novatech.co":       { password: "Recruiter@123", role: "recruiter", id: "r3" },
+  "j.okafor@novatech.co": { password: "Recruiter@123", role: "recruiter", id: "r3" },
 };
 
 interface Ctx {
@@ -34,7 +34,9 @@ interface Ctx {
   login: (email: string, password: string) => { success: true; role: Role } | { success: false };
   loginAs: (role: Role, id: string) => void;
   logout: () => void;
-  signUp: (data: Omit<RegisteredUser, "id">) => { success: true; id: string } | { success: false; error: string };
+  signUp: (
+    data: Omit<RegisteredUser, "id">,
+  ) => { success: true; id: string } | { success: false; error: string };
 }
 
 const RoleContext = createContext<Ctx | null>(null);
@@ -55,9 +57,12 @@ export function RoleProvider({ children }: { children: ReactNode }) {
   const [registeredUsers, setRegisteredUsers] = useState<RegisteredUser[]>([]);
 
   useEffect(() => {
-    const savedRole = typeof window !== "undefined" ? window.localStorage.getItem("cgt-role") : null;
-    const savedLogin = typeof window !== "undefined" ? window.localStorage.getItem("cgt-logged-in") : null;
-    const savedPersonId = typeof window !== "undefined" ? window.localStorage.getItem("cgt-person-id") : null;
+    const savedRole =
+      typeof window !== "undefined" ? window.localStorage.getItem("cgt-role") : null;
+    const savedLogin =
+      typeof window !== "undefined" ? window.localStorage.getItem("cgt-logged-in") : null;
+    const savedPersonId =
+      typeof window !== "undefined" ? window.localStorage.getItem("cgt-person-id") : null;
     if (savedRole === "student" || savedRole === "recruiter") setRoleState(savedRole);
     if (savedLogin === "true") setIsLoggedIn(true);
     if (savedPersonId) setPersonId(savedPersonId);
@@ -80,7 +85,10 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const login = (email: string, password: string): { success: true; role: Role } | { success: false } => {
+  const login = (
+    email: string,
+    password: string,
+  ): { success: true; role: Role } | { success: false } => {
     const key = email.toLowerCase().trim();
 
     // 1. Check demo accounts
@@ -111,7 +119,9 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signUp = (data: Omit<RegisteredUser, "id">): { success: true; id: string } | { success: false; error: string } => {
+  const signUp = (
+    data: Omit<RegisteredUser, "id">,
+  ): { success: true; id: string } | { success: false; error: string } => {
     const emailKey = data.email.toLowerCase().trim();
 
     // Block if email matches a demo account
@@ -137,7 +147,19 @@ export function RoleProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <RoleContext.Provider value={{ role, setRole, isLoggedIn, personId, registeredUsers, login, loginAs, logout, signUp }}>
+    <RoleContext.Provider
+      value={{
+        role,
+        setRole,
+        isLoggedIn,
+        personId,
+        registeredUsers,
+        login,
+        loginAs,
+        logout,
+        signUp,
+      }}
+    >
       {children}
     </RoleContext.Provider>
   );

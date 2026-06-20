@@ -42,7 +42,9 @@ export function useStudent() {
 
   if (!student && typeof window !== "undefined") {
     try {
-      const registered: RegisteredUser[] = JSON.parse(window.localStorage.getItem("cgt-registered-users") ?? "[]");
+      const registered: RegisteredUser[] = JSON.parse(
+        window.localStorage.getItem("cgt-registered-users") ?? "[]",
+      );
       const reg = registered.find((u) => u.id === ctx.studentId && u.role === "student");
       if (reg) student = registeredToStudent(reg);
     } catch {

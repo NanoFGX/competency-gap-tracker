@@ -43,15 +43,24 @@ function SignUpPage() {
 
   useEffect(() => {
     if (step !== "success") return;
-    if (countdown <= 0) { navigate({ to: "/login" }); return; }
+    if (countdown <= 0) {
+      navigate({ to: "/login" });
+      return;
+    }
     const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
     return () => clearTimeout(t);
   }, [step, countdown, navigate]);
 
   const [form, setForm] = useState<FormData>({
-    name: "", email: "", password: "", confirmPassword: "",
-    program: "", university: "", graduationYear: "",
-    company: "", title: "",
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    program: "",
+    university: "",
+    graduationYear: "",
+    company: "",
+    title: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
 
@@ -100,7 +109,10 @@ function SignUpPage() {
   const handleSubmit = (ev: React.FormEvent) => {
     ev.preventDefault();
     const errs = validate();
-    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
+      return;
+    }
 
     setSubmitError(null);
 
@@ -110,7 +122,11 @@ function SignUpPage() {
       email: form.email.trim(),
       password: form.password,
       ...(role === "student"
-        ? { program: form.program.trim(), university: form.university.trim(), graduationYear: parseInt(form.graduationYear, 10) }
+        ? {
+            program: form.program.trim(),
+            university: form.university.trim(),
+            graduationYear: parseInt(form.graduationYear, 10),
+          }
         : { company: form.company.trim(), title: form.title.trim() }),
     });
 
@@ -150,7 +166,9 @@ function SignUpPage() {
           {step === "role" && (
             <>
               <h1 className="text-lg font-semibold text-foreground mb-1">Create an account</h1>
-              <p className="text-sm text-muted-foreground mb-6">How will you be using the tracker?</p>
+              <p className="text-sm text-muted-foreground mb-6">
+                How will you be using the tracker?
+              </p>
               <div className="grid grid-cols-2 gap-3 mb-6">
                 <RoleCard
                   icon={<GraduationCap className="h-6 w-6" />}
@@ -185,14 +203,20 @@ function SignUpPage() {
                 <ArrowLeft className="h-3.5 w-3.5" /> Back
               </button>
               <div className="flex items-center gap-2 mb-5">
-                <div className={`h-7 w-7 rounded-full grid place-items-center text-xs font-bold ${role === "student" ? "bg-blue-100 text-blue-700" : "bg-orange-100 text-orange-700"}`}>
-                  {role === "student" ? <GraduationCap className="h-3.5 w-3.5" /> : <Building2 className="h-3.5 w-3.5" />}
+                <div className="grid h-7 w-7 place-items-center rounded-full bg-primary/10 text-primary text-xs font-bold">
+                  {role === "student" ? (
+                    <GraduationCap className="h-3.5 w-3.5" />
+                  ) : (
+                    <Building2 className="h-3.5 w-3.5" />
+                  )}
                 </div>
                 <div>
                   <h1 className="text-base font-semibold leading-tight">
                     {role === "student" ? "Student" : "Recruiter"} details
                   </h1>
-                  <p className="text-xs text-muted-foreground">Fill in your information to get started</p>
+                  <p className="text-xs text-muted-foreground">
+                    Fill in your information to get started
+                  </p>
                 </div>
               </div>
 
@@ -206,12 +230,22 @@ function SignUpPage() {
                 {/* Name + Email */}
                 <div className="grid grid-cols-1 gap-4">
                   <Field label="Full name *" error={errors.name}>
-                    <input value={form.name} onChange={(e) => set("name", e.target.value)}
-                      className={`inp${errors.name ? " inp-error" : ""}`} placeholder="e.g. Aisha Rahman" />
+                    <input
+                      value={form.name}
+                      onChange={(e) => set("name", e.target.value)}
+                      className={`inp${errors.name ? " inp-error" : ""}`}
+                      placeholder="e.g. Aisha Rahman"
+                    />
                   </Field>
                   <Field label="Email address *" error={errors.email}>
-                    <input type="email" value={form.email} onChange={(e) => set("email", e.target.value)}
-                      className={`inp${errors.email ? " inp-error" : ""}`} placeholder="you@example.com" inputMode="email" />
+                    <input
+                      type="email"
+                      value={form.email}
+                      onChange={(e) => set("email", e.target.value)}
+                      className={`inp${errors.email ? " inp-error" : ""}`}
+                      placeholder="you@example.com"
+                      inputMode="email"
+                    />
                   </Field>
                 </div>
 
@@ -219,29 +253,51 @@ function SignUpPage() {
                 {role === "student" ? (
                   <div className="grid grid-cols-1 gap-4">
                     <Field label="Program / Degree *" error={errors.program}>
-                      <input value={form.program} onChange={(e) => set("program", e.target.value)}
-                        className={`inp${errors.program ? " inp-error" : ""}`} placeholder="e.g. BSc Computer Science" />
+                      <input
+                        value={form.program}
+                        onChange={(e) => set("program", e.target.value)}
+                        className={`inp${errors.program ? " inp-error" : ""}`}
+                        placeholder="e.g. BSc Computer Science"
+                      />
                     </Field>
                     <div className="grid grid-cols-2 gap-3">
                       <Field label="University *" error={errors.university}>
-                        <input value={form.university} onChange={(e) => set("university", e.target.value)}
-                          className={`inp${errors.university ? " inp-error" : ""}`} placeholder="e.g. University of Leeds" />
+                        <input
+                          value={form.university}
+                          onChange={(e) => set("university", e.target.value)}
+                          className={`inp${errors.university ? " inp-error" : ""}`}
+                          placeholder="e.g. University of Leeds"
+                        />
                       </Field>
                       <Field label="Graduation year *" error={errors.graduationYear}>
-                        <input value={form.graduationYear} onChange={(e) => set("graduationYear", e.target.value)}
-                          className={`inp${errors.graduationYear ? " inp-error" : ""}`} placeholder={String(CURRENT_YEAR + 1)} inputMode="numeric" maxLength={4} />
+                        <input
+                          value={form.graduationYear}
+                          onChange={(e) => set("graduationYear", e.target.value)}
+                          className={`inp${errors.graduationYear ? " inp-error" : ""}`}
+                          placeholder={String(CURRENT_YEAR + 1)}
+                          inputMode="numeric"
+                          maxLength={4}
+                        />
                       </Field>
                     </div>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-3">
                     <Field label="Company *" error={errors.company}>
-                      <input value={form.company} onChange={(e) => set("company", e.target.value)}
-                        className={`inp${errors.company ? " inp-error" : ""}`} placeholder="e.g. Accenture" />
+                      <input
+                        value={form.company}
+                        onChange={(e) => set("company", e.target.value)}
+                        className={`inp${errors.company ? " inp-error" : ""}`}
+                        placeholder="e.g. Accenture"
+                      />
                     </Field>
                     <Field label="Job title *" error={errors.title}>
-                      <input value={form.title} onChange={(e) => set("title", e.target.value)}
-                        className={`inp${errors.title ? " inp-error" : ""}`} placeholder="e.g. Technical Recruiter" />
+                      <input
+                        value={form.title}
+                        onChange={(e) => set("title", e.target.value)}
+                        className={`inp${errors.title ? " inp-error" : ""}`}
+                        placeholder="e.g. Technical Recruiter"
+                      />
                     </Field>
                   </div>
                 )}
@@ -288,11 +344,13 @@ function SignUpPage() {
                       {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
-                  {form.confirmPassword && form.password === form.confirmPassword && !errors.confirmPassword && (
-                    <div className="flex items-center gap-1 mt-1 text-xs text-[color:var(--success)]">
-                      <CheckCircle2 className="h-3 w-3" /> Passwords match
-                    </div>
-                  )}
+                  {form.confirmPassword &&
+                    form.password === form.confirmPassword &&
+                    !errors.confirmPassword && (
+                      <div className="flex items-center gap-1 mt-1 text-xs text-[color:var(--success)]">
+                        <CheckCircle2 className="h-3 w-3" /> Passwords match
+                      </div>
+                    )}
                 </Field>
 
                 <button
@@ -372,8 +430,18 @@ function PasswordStrength({ password }: { password: string }) {
   ];
   const score = checks.filter(Boolean).length;
   const labels = ["Weak", "Fair", "Good", "Strong"];
-  const colors = ["bg-destructive", "bg-[color:var(--warning)]", "oklch(0.6 0.15 145)", "bg-[color:var(--success)]"];
-  const textColors = ["text-destructive", "text-[color:var(--warning)]", "text-emerald-600", "text-[color:var(--success)]"];
+  const colors = [
+    "bg-destructive",
+    "bg-[color:var(--warning)]",
+    "oklch(0.6 0.15 145)",
+    "bg-[color:var(--success)]",
+  ];
+  const textColors = [
+    "text-destructive",
+    "text-[color:var(--warning)]",
+    "text-emerald-600",
+    "text-[color:var(--success)]",
+  ];
 
   return (
     <div className="mt-1.5 space-y-1">
@@ -385,7 +453,9 @@ function PasswordStrength({ password }: { password: string }) {
           />
         ))}
       </div>
-      <div className={`text-[10px] font-medium ${textColors[score - 1] ?? "text-muted-foreground"}`}>
+      <div
+        className={`text-[10px] font-medium ${textColors[score - 1] ?? "text-muted-foreground"}`}
+      >
         {score > 0 ? labels[score - 1] : ""}
       </div>
     </div>
@@ -393,7 +463,11 @@ function PasswordStrength({ password }: { password: string }) {
 }
 
 function RoleCard({
-  icon, label, description, selected, onClick,
+  icon,
+  label,
+  description,
+  selected,
+  onClick,
 }: {
   icon: React.ReactNode;
   label: string;
@@ -421,7 +495,9 @@ function RoleCard({
 }
 
 function Field({
-  label, error, children,
+  label,
+  error,
+  children,
 }: {
   label: string;
   error?: string;
@@ -431,9 +507,7 @@ function Field({
     <label className="block">
       <span className="text-xs font-medium text-muted-foreground mb-1.5 block">{label}</span>
       {children}
-      {error && (
-        <p className="text-xs text-destructive mt-1">{error}</p>
-      )}
+      {error && <p className="text-xs text-destructive mt-1">{error}</p>}
     </label>
   );
 }

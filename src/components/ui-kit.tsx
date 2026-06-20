@@ -7,22 +7,23 @@ import { cn } from "@/lib/utils";
    States: default · hover (brand-darkens) · active (press-scale, global) ·
            focus-visible (ring, global) · disabled · loading.
 ─────────────────────────────────────────────────────────────────────────── */
-export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "destructive" | "success";
+export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "outline"
+  | "ghost"
+  | "destructive"
+  | "success";
 export type ButtonSize = "sm" | "md" | "lg" | "icon";
 
 const VARIANT: Record<ButtonVariant, string> = {
-  primary:
-    "bg-primary text-primary-foreground shadow-sm hover:bg-[color:var(--primary-hover)]",
-  secondary:
-    "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground",
+  primary: "bg-primary text-primary-foreground shadow-sm hover:bg-[color:var(--primary-hover)]",
+  secondary: "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground",
   outline:
     "border border-border bg-card text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground",
-  ghost:
-    "text-muted-foreground hover:bg-accent hover:text-foreground",
-  destructive:
-    "bg-destructive text-destructive-foreground shadow-sm hover:opacity-90",
-  success:
-    "bg-success text-success-foreground shadow-sm hover:opacity-90",
+  ghost: "text-muted-foreground hover:bg-accent hover:text-foreground",
+  destructive: "bg-destructive text-destructive-foreground shadow-sm hover:opacity-90",
+  success: "bg-success text-success-foreground shadow-sm hover:opacity-90",
 };
 
 const SIZE: Record<ButtonSize, string> = {
@@ -39,7 +40,10 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "primary", size = "md", loading = false, disabled, children, ...props }, ref) => (
+  (
+    { className, variant = "primary", size = "md", loading = false, disabled, children, ...props },
+    ref,
+  ) => (
     <button
       ref={ref}
       disabled={disabled || loading}
@@ -90,34 +94,36 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 );
 Input.displayName = "Input";
 
-export const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTMLAttributes<HTMLTextAreaElement> & { invalid?: boolean }>(
-  ({ className, invalid, ...props }, ref) => (
-    <textarea
-      ref={ref}
-      aria-invalid={invalid || undefined}
-      className={cn(
-        FIELD_BASE,
-        "px-3 py-2 text-sm resize-none",
-        invalid ? "border-destructive focus-visible:ring-destructive/40" : "border-input",
-        className,
-      )}
-      {...props}
-    />
-  ),
-);
+export const Textarea = React.forwardRef<
+  HTMLTextAreaElement,
+  React.TextareaHTMLAttributes<HTMLTextAreaElement> & { invalid?: boolean }
+>(({ className, invalid, ...props }, ref) => (
+  <textarea
+    ref={ref}
+    aria-invalid={invalid || undefined}
+    className={cn(
+      FIELD_BASE,
+      "px-3 py-2 text-sm resize-none",
+      invalid ? "border-destructive focus-visible:ring-destructive/40" : "border-input",
+      className,
+    )}
+    {...props}
+  />
+));
 Textarea.displayName = "Textarea";
 
-export const Select = React.forwardRef<HTMLSelectElement, React.SelectHTMLAttributes<HTMLSelectElement>>(
-  ({ className, children, ...props }, ref) => (
-    <select
-      ref={ref}
-      className={cn(FIELD_BASE, "h-9 px-3 text-sm border-input cursor-pointer", className)}
-      {...props}
-    >
-      {children}
-    </select>
-  ),
-);
+export const Select = React.forwardRef<
+  HTMLSelectElement,
+  React.SelectHTMLAttributes<HTMLSelectElement>
+>(({ className, children, ...props }, ref) => (
+  <select
+    ref={ref}
+    className={cn(FIELD_BASE, "h-9 px-3 text-sm border-input cursor-pointer", className)}
+    {...props}
+  >
+    {children}
+  </select>
+));
 Select.displayName = "Select";
 
 export function FieldLabel({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) {
@@ -126,4 +132,35 @@ export function FieldLabel({ children, htmlFor }: { children: React.ReactNode; h
       {children}
     </label>
   );
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   AVATAR — theme-adaptive tinted initials. Colours mix toward --card and
+   --foreground, so the same index stays legible in light AND dark mode.
+─────────────────────────────────────────────────────────────────────────── */
+const AVATAR_HUES = [
+  "oklch(0.55 0.205 275)", // indigo
+  "oklch(0.585 0.205 305)", // violet
+  "oklch(0.62 0.15 155)", // emerald
+  "oklch(0.705 0.158 64)", // amber
+  "oklch(0.62 0.205 12)", // rose
+  "oklch(0.66 0.13 215)", // cyan
+];
+
+export function avatarStyle(i: number): React.CSSProperties {
+  const h = AVATAR_HUES[((i % AVATAR_HUES.length) + AVATAR_HUES.length) % AVATAR_HUES.length];
+  return {
+    background: `color-mix(in oklch, ${h} 16%, var(--card))`,
+    color: `color-mix(in oklch, ${h} 80%, var(--foreground))`,
+    boxShadow: `inset 0 0 0 1px color-mix(in oklch, ${h} 28%, transparent)`,
+  };
+}
+
+export function initials(name: string) {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 }

@@ -1,11 +1,30 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from "recharts";
+import {
+  Radar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 import { ArrowUpRight, TrendingUp, TrendingDown, AlertTriangle } from "lucide-react";
 import { useStudent } from "@/lib/student-context";
-import { COMPETENCIES, careerTargets, evaluations, evidence, latestScores, readinessScore, strengthsWeaknesses, tier } from "@/lib/mock-data";
+import {
+  COMPETENCIES,
+  careerTargets,
+  evaluations,
+  evidence,
+  latestScores,
+  readinessScore,
+  strengthsWeaknesses,
+  tier,
+} from "@/lib/mock-data";
 import { Card, CardHeader, PageHeader } from "@/components/page-header";
 import { Pill, StatusBadge } from "@/components/badges";
 import { InfoIcon, ScoreLegend } from "@/components/ui";
+import { useChartTheme } from "@/lib/chart-theme";
+import { LayoutDashboard } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title: "Dashboard — Competency Tracker" }] }),
@@ -14,6 +33,7 @@ export const Route = createFileRoute("/")({
 
 function Dashboard() {
   const { student } = useStudent();
+  const chart = useChartTheme();
   const scores = latestScores(student.id);
   const score = readinessScore(scores);
   const { strengths, weaknesses } = strengthsWeaknesses(scores);
@@ -38,6 +58,8 @@ function Dashboard() {
   return (
     <>
       <PageHeader
+        eyebrow="Student dashboard"
+        icon={<LayoutDashboard className="h-5 w-5" />}
         title={`${student.name}`}
         description={`${student.program} · ${student.email}`}
       />
@@ -48,9 +70,16 @@ function Dashboard() {
           <div className="text-sm">
             <span className="font-medium">Skill gap detected.</span>{" "}
             <span className="text-muted-foreground">
-              {gaps.slice(0, 2).map((c) => `${c} is ${scores[c]}/${target[c]} for Software Engineer`).join("; ")}. Add targeted evidence to close the gap.
+              {gaps
+                .slice(0, 2)
+                .map((c) => `${c} is ${scores[c]}/${target[c]} for Software Engineer`)
+                .join("; ")}
+              . Add targeted evidence to close the gap.
             </span>{" "}
-            <Link to="/career" className="font-medium text-primary hover:underline whitespace-nowrap">
+            <Link
+              to="/career"
+              className="font-medium text-primary hover:underline whitespace-nowrap"
+            >
               Review target →
             </Link>
           </div>
@@ -69,7 +98,11 @@ function Dashboard() {
           value={String(evals.length)}
           hint={`Across ${new Set(evals.map((e) => e.mentorId)).size} mentors`}
         />
-        <Stat label="Evidence Approved" value={`${approved}/${evs.length}`} hint="Validated submissions" />
+        <Stat
+          label="Evidence Approved"
+          value={`${approved}/${evs.length}`}
+          hint="Validated submissions"
+        />
         <Stat label="Pending Review" value={String(pending)} hint="Awaiting mentor validation" />
         <Stat
           label="Best role fit"
@@ -81,7 +114,10 @@ function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card className="lg:col-span-2">
-          <CardHeader title="Competency Profile" description="Latest aggregated mentor scores (1–10 scale)" />
+          <CardHeader
+            title="Competency Profile"
+            description="Latest aggregated mentor scores (1–10 scale)"
+          />
           <div className="px-5 py-2.5 border-b border-border/50 bg-muted/20">
             <ScoreLegend />
           </div>
@@ -89,30 +125,23 @@ function Dashboard() {
             <div className="h-[310px]">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={radarData} outerRadius="75%">
-                  <PolarGrid stroke="oklch(0.92 0.006 250)" />
-                  <PolarAngleAxis dataKey="competency" tick={{ fill: "oklch(0.4 0.02 260)", fontSize: 12 }} />
+                  <PolarGrid stroke={chart.grid} />
+                  <PolarAngleAxis dataKey="competency" tick={{ fill: chart.axis, fontSize: 12 }} />
                   <PolarRadiusAxis
                     angle={90}
                     domain={[0, 10]}
-                    tick={{ fill: "oklch(0.6 0.02 260)", fontSize: 10 }}
+                    tick={{ fill: chart.axis, fontSize: 10 }}
                     tickCount={6}
                   />
                   <Radar
                     name="Score"
                     dataKey="score"
-                    stroke="oklch(0.45 0.09 250)"
-                    fill="oklch(0.45 0.09 250)"
+                    stroke={chart.primary}
+                    fill={chart.primary}
                     fillOpacity={0.18}
                     strokeWidth={2}
                   />
-                  <Tooltip
-                    contentStyle={{
-                      background: "white",
-                      border: "1px solid oklch(0.92 0.006 250)",
-                      borderRadius: 6,
-                      fontSize: 12,
-                    }}
-                  />
+                  <Tooltip contentStyle={chart.tooltip} />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
@@ -120,9 +149,15 @@ function Dashboard() {
         </Card>
 
         <Card>
-          <CardHeader title="Insight Summary" description="Rule-based reading of the latest profile" />
+          <CardHeader
+            title="Insight Summary"
+            description="Rule-based reading of the latest profile"
+          />
           <div className="p-5 space-y-5">
-            <Section icon={<TrendingUp className="h-3.5 w-3.5 text-[color:var(--success)]" />} label="Strengths">
+            <Section
+              icon={<TrendingUp className="h-3.5 w-3.5 text-[color:var(--success)]" />}
+              label="Strengths"
+            >
               {strengths.map((c) => (
                 <Pill key={c} tone="strong">
                   {c} · {scores[c]}/10
@@ -171,12 +206,14 @@ function Dashboard() {
                         coverage >= 80
                           ? "var(--success)"
                           : coverage >= 50
-                          ? "oklch(0.45 0.09 250)"
-                          : "var(--warning)",
+                            ? "var(--primary)"
+                            : "var(--warning)",
                     }}
                   />
                 </div>
-                <span className="text-xs font-mono text-muted-foreground w-10 text-right">{coverage}%</span>
+                <span className="text-xs font-mono text-muted-foreground w-10 text-right">
+                  {coverage}%
+                </span>
               </div>
             ))}
             <Link
@@ -191,29 +228,35 @@ function Dashboard() {
         <Card>
           <CardHeader title="Recent Evidence" description="Submissions mapped to competencies" />
           <ul className="divide-y divide-border">
-            {evs.slice(-4).reverse().map((e) => (
-              <li key={e.id} className="px-5 py-3 flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="text-sm font-medium truncate">{e.title}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {e.type} · {e.submittedAt}
+            {evs
+              .slice(-4)
+              .reverse()
+              .map((e) => (
+                <li key={e.id} className="px-5 py-3 flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium truncate">{e.title}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {e.type} · {e.submittedAt}
+                    </div>
                   </div>
-                </div>
-                <StatusBadge status={e.status} />
-              </li>
-            ))}
+                  <StatusBadge status={e.status} />
+                </li>
+              ))}
           </ul>
         </Card>
 
         <Card>
           <CardHeader title="Recent Mentor Notes" description="Qualitative feedback" />
           <ul className="divide-y divide-border">
-            {evals.slice(-3).reverse().map((v) => (
-              <li key={v.id} className="px-5 py-3">
-                <div className="text-xs text-muted-foreground">{v.date}</div>
-                <div className="text-sm mt-0.5 leading-snug">{v.comment}</div>
-              </li>
-            ))}
+            {evals
+              .slice(-3)
+              .reverse()
+              .map((v) => (
+                <li key={v.id} className="px-5 py-3">
+                  <div className="text-xs text-muted-foreground">{v.date}</div>
+                  <div className="text-sm mt-0.5 leading-snug">{v.comment}</div>
+                </li>
+              ))}
           </ul>
         </Card>
       </div>
@@ -221,7 +264,17 @@ function Dashboard() {
   );
 }
 
-function Stat({ label, value, hint, tip }: { label: string; value: string; hint?: string; tip?: string }) {
+function Stat({
+  label,
+  value,
+  hint,
+  tip,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+  tip?: string;
+}) {
   return (
     <div className="rounded-lg border border-border bg-card px-5 py-4">
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">

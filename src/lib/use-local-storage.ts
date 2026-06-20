@@ -19,7 +19,9 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
           if (typeof window !== "undefined") {
             window.localStorage.setItem(key, JSON.stringify(next));
           }
-        } catch {}
+        } catch {
+          // storage unavailable (private mode / quota) — keep in-memory value
+        }
         return next;
       });
     },

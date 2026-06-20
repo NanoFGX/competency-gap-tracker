@@ -1,6 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Github, FileText, Presentation, Trophy, Plus, X, Upload, CheckCircle2, Clock, XCircle, User } from "lucide-react";
+import {
+  Github,
+  FileText,
+  Presentation,
+  Trophy,
+  Plus,
+  X,
+  Upload,
+  CheckCircle2,
+  Clock,
+  XCircle,
+  User,
+} from "lucide-react";
 import { useStudent } from "@/lib/student-context";
 import {
   COMPETENCIES,
@@ -37,7 +49,10 @@ function EvidencePage() {
   const { student } = useStudent();
   const [extra, setExtra] = useLocalStorage<Evidence[]>("cgt-extra-evidence", []);
   const [withdrawnArr, setWithdrawnArr] = useLocalStorage<string[]>("cgt-withdrawn", []);
-  const [decisions] = useLocalStorage<Partial<Record<string, "Approved" | "Rejected">>>("cgt-mentor-decisions", {});
+  const [decisions] = useLocalStorage<Partial<Record<string, "Approved" | "Rejected">>>(
+    "cgt-mentor-decisions",
+    {},
+  );
   const [submittedEvals] = useLocalStorage<SubmittedEval[]>("cgt-submitted-evaluations", []);
   const withdrawn = useMemo(() => new Set(withdrawnArr), [withdrawnArr]);
   const [open, setOpen] = useState(false);
@@ -56,7 +71,10 @@ function EvidencePage() {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        if (detailEvidence) { setDetailEvidence(null); return; }
+        if (detailEvidence) {
+          setDetailEvidence(null);
+          return;
+        }
         setOpen(false);
       }
     };
@@ -81,12 +99,14 @@ function EvidencePage() {
   return (
     <>
       <PageHeader
+        eyebrow="Student"
+        icon={<FileText className="h-5 w-5" />}
         title="Evidence Portfolio"
         description="Concrete work mapped to competencies. Each item is mentor-validated before it counts toward your profile."
         actions={
           <button
             onClick={() => setOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-[color:var(--primary-hover)]"
           >
             <Plus className="h-4 w-4" /> New evidence
           </button>
@@ -117,7 +137,10 @@ function EvidencePage() {
           effectiveStatus={decisions[detailEvidence.id] ?? detailEvidence.status}
           runtimeEval={submittedEvals.find((s) => s.evidenceId === detailEvidence.id)}
           onClose={() => setDetailEvidence(null)}
-          onRequestWithdraw={(id) => { setDetailEvidence(null); setPendingWithdrawId(id); }}
+          onRequestWithdraw={(id) => {
+            setDetailEvidence(null);
+            setPendingWithdrawId(id);
+          }}
         />
       )}
 
@@ -136,7 +159,9 @@ function EvidencePage() {
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
               <div>
-                <h2 id="modal-title" className="text-base font-semibold">Submit Evidence</h2>
+                <h2 id="modal-title" className="text-base font-semibold">
+                  Submit Evidence
+                </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   Add work mapped to your competencies for mentor review
                   <span className="ml-2 text-muted-foreground/45">(Esc to close)</span>
@@ -232,7 +257,9 @@ function EvidenceCard({
             <Icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
           </div>
           <div className="min-w-0">
-            <div className="text-sm font-semibold truncate group-hover:text-primary transition-colors">{e.title}</div>
+            <div className="text-sm font-semibold truncate group-hover:text-primary transition-colors">
+              {e.title}
+            </div>
             <div className="text-xs text-muted-foreground">
               {e.type} · {e.submittedAt}
             </div>
@@ -243,7 +270,9 @@ function EvidenceCard({
         </div>
       </div>
       <div className="px-5 py-4 text-sm text-muted-foreground leading-relaxed flex-1 line-clamp-3">
-        {e.description || <span className="italic text-muted-foreground/50">No description provided.</span>}
+        {e.description || (
+          <span className="italic text-muted-foreground/50">No description provided.</span>
+        )}
       </div>
       <div className="px-5 py-3 border-t border-border flex flex-wrap items-center gap-2">
         {e.competencies.map((c) => (
@@ -265,14 +294,19 @@ function EvidenceCard({
           ) : null}
           {effectiveStatus === "Pending" && (
             <button
-              onClick={(ev) => { ev.stopPropagation(); onRequestWithdraw(e.id); }}
+              onClick={(ev) => {
+                ev.stopPropagation();
+                onRequestWithdraw(e.id);
+              }}
               className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 px-2.5 py-1 rounded-md border border-border transition-colors"
               aria-label="Withdraw this submission"
             >
               <X className="h-3 w-3" /> Withdraw
             </button>
           )}
-          <span className="text-[10px] text-muted-foreground/50 hidden group-hover:inline">View details →</span>
+          <span className="text-[10px] text-muted-foreground/50 hidden group-hover:inline">
+            View details →
+          </span>
         </div>
       </div>
     </div>
@@ -359,11 +393,7 @@ function NewEvidenceForm({
 
         {/* Type */}
         <Field label="Type *">
-          <select
-            value={typeValue}
-            onChange={(e) => setTypeValue(e.target.value)}
-            className="inp"
-          >
+          <select value={typeValue} onChange={(e) => setTypeValue(e.target.value)} className="inp">
             {PRESET_TYPES.map((t) => (
               <option key={t} value={t}>
                 {t}
@@ -508,7 +538,12 @@ function EvidenceDetailModal({
 
   // Prefer runtime eval (from mentor page), fall back to seeded mock feedback
   const fb = runtimeEval
-    ? { mentorId: runtimeEval.mentorId, date: runtimeEval.date, scores: runtimeEval.scores, comment: runtimeEval.comment }
+    ? {
+        mentorId: runtimeEval.mentorId,
+        date: runtimeEval.date,
+        scores: runtimeEval.scores,
+        comment: runtimeEval.comment,
+      }
     : e.mentorFeedback;
   const mentorName = fb ? (mentors.find((m) => m.id === fb.mentorId)?.name ?? "Mentor") : null;
 
@@ -558,9 +593,13 @@ function EvidenceDetailModal({
         <div className="overflow-y-auto flex-1 px-6 py-5 space-y-5">
           {/* Description */}
           <div>
-            <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground mb-2">Description</div>
+            <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground mb-2">
+              Description
+            </div>
             <p className="text-sm leading-relaxed text-foreground">
-              {e.description || <span className="italic text-muted-foreground">No description provided.</span>}
+              {e.description || (
+                <span className="italic text-muted-foreground">No description provided.</span>
+              )}
             </p>
           </div>
 
@@ -577,7 +616,10 @@ function EvidenceDetailModal({
               </a>
             )}
             {e.competencies.map((c) => (
-              <span key={c} className="text-xs px-2.5 py-1 rounded-md bg-accent text-accent-foreground border border-border">
+              <span
+                key={c}
+                className="text-xs px-2.5 py-1 rounded-md bg-accent text-accent-foreground border border-border"
+              >
                 {c}
               </span>
             ))}
@@ -590,7 +632,8 @@ function EvidenceDetailModal({
               <div>
                 <div className="text-xs font-semibold mb-0.5">Awaiting mentor review</div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  This evidence hasn't been evaluated yet. Mentor feedback and competency scores will appear here once a mentor has reviewed your submission.
+                  This evidence hasn't been evaluated yet. Mentor feedback and competency scores
+                  will appear here once a mentor has reviewed your submission.
                 </p>
               </div>
             </div>
@@ -612,7 +655,8 @@ function EvidenceDetailModal({
               <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1.5">
                   <User className="h-3.5 w-3.5" />
-                  Reviewed by <span className="font-medium text-foreground/70 ml-1">{mentorName}</span>
+                  Reviewed by{" "}
+                  <span className="font-medium text-foreground/70 ml-1">{mentorName}</span>
                 </span>
                 <span>· {fb.date}</span>
               </div>
@@ -640,8 +684,8 @@ function EvidenceDetailModal({
                               score >= 8
                                 ? "var(--success)"
                                 : score >= 5
-                                ? "oklch(0.45 0.09 250)"
-                                : "var(--warning)",
+                                  ? "var(--primary)"
+                                  : "var(--warning)",
                           }}
                         />
                       </div>
@@ -668,7 +712,9 @@ function EvidenceDetailModal({
               {statusIcon}
               <div>
                 <div className="text-xs font-semibold">Mentor Assessment</div>
-                <p className="text-xs text-muted-foreground mt-0.5">No detailed feedback recorded for this submission.</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  No detailed feedback recorded for this submission.
+                </p>
               </div>
             </div>
           )}

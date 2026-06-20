@@ -10,8 +10,18 @@ export const Route = createFileRoute("/login")({
 });
 
 const DEMO = [
-  { label: "Student", email: "aisha.r@university.edu", password: "Student@123", icon: GraduationCap },
-  { label: "Recruiter", email: "s.marc@zurichservices.com", password: "Recruiter@123", icon: ShieldCheck },
+  {
+    label: "Student",
+    email: "aisha.r@university.edu",
+    password: "Student@123",
+    icon: GraduationCap,
+  },
+  {
+    label: "Recruiter",
+    email: "s.marc@zurichservices.com",
+    password: "Recruiter@123",
+    icon: ShieldCheck,
+  },
 ];
 
 function LoginPage() {
@@ -77,7 +87,10 @@ function LoginPage() {
           <p className="mb-6 text-sm text-muted-foreground">Sign in to your competency profile.</p>
 
           <form
-            onSubmit={(e) => { e.preventDefault(); submit(email, password); }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              submit(email, password);
+            }}
             noValidate
             className="space-y-4"
           >
@@ -88,11 +101,16 @@ function LoginPage() {
             )}
 
             <label className="block">
-              <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Email address</span>
+              <span className="mb-1.5 block text-xs font-medium text-muted-foreground">
+                Email address
+              </span>
               <input
                 type="email"
                 value={email}
-                onChange={(e) => { setEmail(e.target.value); setError(null); }}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setError(null);
+                }}
                 className="inp"
                 placeholder="you@example.com"
                 inputMode="email"
@@ -102,12 +120,17 @@ function LoginPage() {
             </label>
 
             <label className="block">
-              <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Password</span>
+              <span className="mb-1.5 block text-xs font-medium text-muted-foreground">
+                Password
+              </span>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => { setPassword(e.target.value); setError(null); }}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setError(null);
+                  }}
                   className="inp pr-9"
                   placeholder="••••••••"
                   autoComplete="current-password"
@@ -143,7 +166,11 @@ function LoginPage() {
                   <button
                     key={d.label}
                     type="button"
-                    onClick={() => { setEmail(d.email); setPassword(d.password); submit(d.email, d.password); }}
+                    onClick={() => {
+                      setEmail(d.email);
+                      setPassword(d.password);
+                      submit(d.email, d.password);
+                    }}
                     className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border bg-background px-3 py-2 text-xs font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-accent"
                   >
                     <Icon className="h-3.5 w-3.5 text-primary" /> {d.label}
