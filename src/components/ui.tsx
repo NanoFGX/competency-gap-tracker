@@ -54,13 +54,10 @@ export function InfoIcon({ tip }: { tip: string }) {
 // Heuristics: Visibility of system status (#1), Recover from errors (#9)
 type BannerType = "success" | "error" | "warning";
 
-const BANNER_STYLES: Record<BannerType, string> = {
-  success:
-    "border-[color:oklch(0.65_0.1_155)]/35 bg-[color:oklch(0.65_0.1_155)]/10 text-[color:oklch(0.38_0.1_155)]",
-  error:
-    "border-destructive/30 bg-destructive/8 text-destructive",
-  warning:
-    "border-[color:oklch(0.72_0.12_65)]/35 bg-[color:oklch(0.72_0.12_65)]/10 text-[color:oklch(0.50_0.12_65)]",
+const BANNER_TOKEN: Record<BannerType, string> = {
+  success: "--success",
+  error: "--destructive",
+  warning: "--warning",
 };
 
 const BANNER_ICONS: Record<BannerType, React.ComponentType<{ className?: string }>> = {
@@ -79,11 +76,17 @@ export function Banner({
   onDismiss?: () => void;
 }) {
   const Icon = BANNER_ICONS[type];
+  const v = BANNER_TOKEN[type];
   return (
     <div
       role="alert"
       aria-live="polite"
-      className={`flex items-start gap-3 rounded-lg border px-4 py-3 mb-4 ${BANNER_STYLES[type]}`}
+      className="flex items-start gap-3 rounded-lg border px-4 py-3 mb-4"
+      style={{
+        borderColor: `color-mix(in oklch, var(${v}) 32%, transparent)`,
+        background: `color-mix(in oklch, var(${v}) 11%, var(--card))`,
+        color: `color-mix(in oklch, var(${v}) 70%, var(--foreground))`,
+      }}
     >
       <Icon className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />
       <span className="text-sm flex-1 leading-snug">{message}</span>

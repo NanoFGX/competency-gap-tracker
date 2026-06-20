@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { GraduationCap, Building2, ArrowLeft, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRole, type Role } from "@/lib/role-context";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({ meta: [{ title: "Sign up — Competency Tracker" }] }),
@@ -123,8 +124,17 @@ function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md">
+    <div
+      className="relative flex min-h-screen items-center justify-center px-4 py-10"
+      style={{
+        background:
+          "radial-gradient(1100px 520px at 50% -8%, color-mix(in oklch, var(--primary) 14%, var(--background)) 0%, var(--background) 60%)",
+      }}
+    >
+      <div className="absolute right-4 top-4">
+        <ThemeToggle variant="icon" />
+      </div>
+      <div className="relative w-full max-w-md cgt-rise">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2.5 mb-8">
           <div className="h-9 w-9 rounded-lg bg-primary text-primary-foreground grid place-items-center shadow-sm">
@@ -136,7 +146,7 @@ function SignUpPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-card shadow-sm p-6">
+        <div className="rounded-2xl border border-border bg-card shadow-[var(--elevation-3)] p-6">
           {step === "role" && (
             <>
               <h1 className="text-lg font-semibold text-foreground mb-1">Create an account</h1>
@@ -344,10 +354,10 @@ function SignUpPage() {
       </div>
 
       <style>{`
-        .inp { width: 100%; border: 1px solid var(--input); background: var(--background); border-radius: 6px; padding: 6px 10px; font-size: 13px; outline: none; }
-        .inp:focus { box-shadow: 0 0 0 2px var(--ring); }
+        .inp { width: 100%; border: 1px solid var(--input); background: var(--background); border-radius: 8px; padding: 8px 12px; font-size: 14px; outline: none; color: var(--foreground); transition: box-shadow .15s, border-color .15s; }
+        .inp:focus-visible { box-shadow: 0 0 0 2px var(--ring); border-color: transparent; }
         .inp-error { border-color: var(--destructive) !important; }
-        .inp-error:focus { box-shadow: 0 0 0 2px color-mix(in oklch, var(--destructive) 30%, transparent); }
+        .inp-error:focus-visible { box-shadow: 0 0 0 2px color-mix(in oklch, var(--destructive) 35%, transparent); }
       `}</style>
     </div>
   );
