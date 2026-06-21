@@ -444,7 +444,8 @@ function NewEvidenceForm({
             <input
               value={githubLink}
               onChange={(e) => setGithubLink(e.target.value)}
-              className="inp pl-8"
+              className="inp"
+              style={{ paddingLeft: "2rem" }}
               placeholder="github.com/user/repo"
               inputMode="url"
             />

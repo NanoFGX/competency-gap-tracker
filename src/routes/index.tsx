@@ -24,6 +24,7 @@ import { Card, CardHeader, PageHeader } from "@/components/page-header";
 import { Pill, StatusBadge } from "@/components/badges";
 import { InfoIcon, ScoreLegend } from "@/components/ui";
 import { useChartTheme } from "@/lib/chart-theme";
+import { AnimatedNumber } from "@/components/motion";
 import { LayoutDashboard } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -90,6 +91,8 @@ function Dashboard() {
         <Stat
           label="Career Readiness"
           value={`${score}%`}
+          animateValue={score}
+          suffix="%"
           hint="Average of all competency scores (1–10)"
           tip="Calculated as the average of all 6 mentor-validated competency scores (1–10 each), expressed as a percentage of the maximum. Higher = stronger overall profile."
         />
@@ -107,6 +110,8 @@ function Dashboard() {
         <Stat
           label="Best role fit"
           value={`${bestRole.coverage}%`}
+          animateValue={bestRole.coverage}
+          suffix="%"
           hint={bestRole.role}
           tip="The career role where the most competency requirements are already met based on your latest mentor scores."
         />
@@ -269,19 +274,29 @@ function Stat({
   value,
   hint,
   tip,
+  animateValue,
+  suffix,
 }: {
   label: string;
   value: string;
   hint?: string;
   tip?: string;
+  animateValue?: number;
+  suffix?: string;
 }) {
   return (
-    <div className="rounded-lg border border-border bg-card px-5 py-4">
+    <div className="rounded-lg border border-border bg-card px-5 py-4 transition-shadow hover:shadow-[var(--elevation-2)]">
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
         {label}
         {tip && <InfoIcon tip={tip} />}
       </div>
-      <div className="mt-1 text-2xl font-semibold tracking-tight">{value}</div>
+      <div className="mt-1 text-2xl font-semibold tracking-tight">
+        {animateValue !== undefined ? (
+          <AnimatedNumber value={animateValue} suffix={suffix} />
+        ) : (
+          value
+        )}
+      </div>
       {hint ? <div className="text-xs text-muted-foreground mt-0.5">{hint}</div> : null}
     </div>
   );

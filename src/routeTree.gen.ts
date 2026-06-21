@@ -16,6 +16,7 @@ import { Route as RecruiterRouteImport } from './routes/recruiter'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as MentorRouteImport } from './routes/mentor'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LandingRouteImport } from './routes/landing'
 import { Route as EvidenceRouteImport } from './routes/evidence'
 import { Route as DesignSystemRouteImport } from './routes/design-system'
 import { Route as CareerRouteImport } from './routes/career'
@@ -56,6 +57,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LandingRoute = LandingRouteImport.update({
+  id: '/landing',
+  path: '/landing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EvidenceRoute = EvidenceRouteImport.update({
   id: '/evidence',
   path: '/evidence',
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/career': typeof CareerRoute
   '/design-system': typeof DesignSystemRoute
   '/evidence': typeof EvidenceRoute
+  '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/mentor': typeof MentorRoute
   '/profile': typeof ProfileRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/career': typeof CareerRoute
   '/design-system': typeof DesignSystemRoute
   '/evidence': typeof EvidenceRoute
+  '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/mentor': typeof MentorRoute
   '/profile': typeof ProfileRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/career': typeof CareerRoute
   '/design-system': typeof DesignSystemRoute
   '/evidence': typeof EvidenceRoute
+  '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/mentor': typeof MentorRoute
   '/profile': typeof ProfileRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/career'
     | '/design-system'
     | '/evidence'
+    | '/landing'
     | '/login'
     | '/mentor'
     | '/profile'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/career'
     | '/design-system'
     | '/evidence'
+    | '/landing'
     | '/login'
     | '/mentor'
     | '/profile'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/career'
     | '/design-system'
     | '/evidence'
+    | '/landing'
     | '/login'
     | '/mentor'
     | '/profile'
@@ -164,6 +176,7 @@ export interface RootRouteChildren {
   CareerRoute: typeof CareerRoute
   DesignSystemRoute: typeof DesignSystemRoute
   EvidenceRoute: typeof EvidenceRoute
+  LandingRoute: typeof LandingRoute
   LoginRoute: typeof LoginRoute
   MentorRoute: typeof MentorRoute
   ProfileRoute: typeof ProfileRoute
@@ -224,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/landing': {
+      id: '/landing'
+      path: '/landing'
+      fullPath: '/landing'
+      preLoaderRoute: typeof LandingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/evidence': {
       id: '/evidence'
       path: '/evidence'
@@ -260,6 +280,7 @@ const rootRouteChildren: RootRouteChildren = {
   CareerRoute: CareerRoute,
   DesignSystemRoute: DesignSystemRoute,
   EvidenceRoute: EvidenceRoute,
+  LandingRoute: LandingRoute,
   LoginRoute: LoginRoute,
   MentorRoute: MentorRoute,
   ProfileRoute: ProfileRoute,

@@ -80,8 +80,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
-    if (!isLoggedIn && pathname !== "/login" && pathname !== "/signup") {
-      navigate({ to: "/login" });
+    if (!isLoggedIn && pathname !== "/login" && pathname !== "/signup" && pathname !== "/landing") {
+      navigate({ to: "/landing" });
     }
   }, [isLoggedIn, pathname, navigate]);
 

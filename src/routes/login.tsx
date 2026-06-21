@@ -72,7 +72,7 @@ function LoginPage() {
 
       <div className="relative w-full max-w-sm cgt-rise">
         {/* Logo */}
-        <div className="mb-8 flex items-center justify-center gap-2.5">
+        <Link to="/landing" className="mb-8 flex items-center justify-center gap-2.5">
           <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground shadow-sm">
             <GraduationCap className="h-5 w-5" />
           </div>
@@ -80,7 +80,7 @@ function LoginPage() {
             <div className="text-base font-semibold tracking-tight">Competency</div>
             <div className="text-xs text-muted-foreground">Gap Tracker</div>
           </div>
-        </div>
+        </Link>
 
         <div className="rounded-2xl border border-border bg-card p-6 shadow-[var(--elevation-3)]">
           <h1 className="mb-1 text-lg font-semibold text-foreground">Welcome back</h1>
@@ -131,7 +131,8 @@ function LoginPage() {
                     setPassword(e.target.value);
                     setError(null);
                   }}
-                  className="inp pr-9"
+                  className="inp"
+                  style={{ paddingRight: "2.25rem" }}
                   placeholder="••••••••"
                   autoComplete="current-password"
                 />

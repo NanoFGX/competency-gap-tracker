@@ -309,7 +309,8 @@ function SignUpPage() {
                       type={showPassword ? "text" : "password"}
                       value={form.password}
                       onChange={(e) => set("password", e.target.value)}
-                      className={`inp pr-9${errors.password ? " inp-error" : ""}`}
+                      className={`inp${errors.password ? " inp-error" : ""}`}
+                      style={{ paddingRight: "2.25rem" }}
                       placeholder="At least 8 characters"
                     />
                     <button
@@ -332,7 +333,8 @@ function SignUpPage() {
                       type={showConfirm ? "text" : "password"}
                       value={form.confirmPassword}
                       onChange={(e) => set("confirmPassword", e.target.value)}
-                      className={`inp pr-9${errors.confirmPassword ? " inp-error" : ""}`}
+                      className={`inp${errors.confirmPassword ? " inp-error" : ""}`}
+                      style={{ paddingRight: "2.25rem" }}
                       placeholder="Repeat your password"
                     />
                     <button
