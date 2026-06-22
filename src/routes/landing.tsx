@@ -134,6 +134,30 @@ function LandingPage() {
           }}
           aria-hidden="true"
         />
+        {!reduce && (
+          <>
+            <motion.div
+              className="pointer-events-none absolute -left-24 top-8 h-72 w-72 rounded-full blur-3xl"
+              style={{
+                background:
+                  "radial-gradient(circle, color-mix(in oklch, var(--primary) 40%, transparent), transparent 70%)",
+              }}
+              animate={{ x: [0, 34, 0], y: [0, -22, 0], scale: [1, 1.12, 1] }}
+              transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+              aria-hidden="true"
+            />
+            <motion.div
+              className="pointer-events-none absolute right-0 top-1/3 h-80 w-80 rounded-full blur-3xl"
+              style={{
+                background:
+                  "radial-gradient(circle, color-mix(in oklch, var(--chart-2) 36%, transparent), transparent 70%)",
+              }}
+              animate={{ x: [0, -30, 0], y: [0, 26, 0], scale: [1.06, 1, 1.06] }}
+              transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+              aria-hidden="true"
+            />
+          </>
+        )}
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 py-20 lg:grid-cols-2 lg:py-28">
           <div>
             <FadeIn>
@@ -144,9 +168,18 @@ function LandingPage() {
             <FadeIn delay={0.08}>
               <h1 className="mt-5 text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">
                 Prove what you can do —{" "}
-                <span className="bg-gradient-to-r from-primary to-[color:var(--chart-2)] bg-clip-text text-transparent">
+                <motion.span
+                  className="bg-clip-text text-transparent"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(90deg, var(--primary), var(--chart-2), var(--primary))",
+                    backgroundSize: "200% 100%",
+                  }}
+                  animate={reduce ? undefined : { backgroundPositionX: ["0%", "-200%"] }}
+                  transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
+                >
                   not just claim it.
-                </span>
+                </motion.span>
               </h1>
             </FadeIn>
             <FadeIn delay={0.16}>
@@ -189,7 +222,12 @@ function LandingPage() {
 
           {/* Hero product mock */}
           <FadeIn delay={0.2} className="lg:justify-self-end">
-            <HeroCard reduce={!!reduce} />
+            <motion.div
+              animate={reduce ? undefined : { y: [0, -10, 0] }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <HeroCard reduce={!!reduce} />
+            </motion.div>
           </FadeIn>
         </div>
       </section>
