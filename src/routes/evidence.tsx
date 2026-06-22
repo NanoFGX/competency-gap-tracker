@@ -45,6 +45,42 @@ function getIcon(type: string) {
   return TYPE_ICONS[type] ?? FileText;
 }
 
+// Branded cover image per evidence type — gradient + motif icon. Self-contained
+// (no network), renders identically in light and dark.
+const COVER: Record<
+  string,
+  { from: string; to: string; Icon: React.ComponentType<{ className?: string }> }
+> = {
+  "GitHub Project": { from: "#4F46E5", to: "#7C3AED", Icon: Github },
+  Report: { from: "#0D9488", to: "#16A34A", Icon: FileText },
+  Presentation: { from: "#D97706", to: "#EA580C", Icon: Presentation },
+  Hackathon: { from: "#7C3AED", to: "#DB2777", Icon: Trophy },
+};
+
+function EvidenceCover({ type, className = "" }: { type: string; className?: string }) {
+  const c = COVER[type] ?? COVER.Report;
+  const Icon = c.Icon;
+  return (
+    <div
+      className={`relative overflow-hidden ${className}`}
+      style={{ background: `linear-gradient(135deg, ${c.from}, ${c.to})` }}
+    >
+      <div
+        className="absolute inset-0 opacity-20"
+        style={{
+          backgroundImage: "radial-gradient(rgba(255,255,255,0.55) 1px, transparent 1px)",
+          backgroundSize: "14px 14px",
+        }}
+        aria-hidden="true"
+      />
+      <Icon className="absolute -bottom-5 -right-3 h-28 w-28 text-white/20" aria-hidden="true" />
+      <div className="absolute bottom-2.5 left-3 inline-flex items-center gap-1.5 rounded-md bg-black/25 px-2 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
+        <Icon className="h-3.5 w-3.5" /> {type}
+      </div>
+    </div>
+  );
+}
+
 function EvidencePage() {
   const { student } = useStudent();
   const [extra, setExtra] = useLocalStorage<Evidence[]>("cgt-extra-evidence", []);
@@ -244,13 +280,14 @@ function EvidenceCard({
 
   return (
     <div
-      className="rounded-lg border border-border bg-card shadow-[0_1px_2px_rgba(15,23,42,0.04)] flex flex-col cursor-pointer hover:border-primary/40 transition-colors group"
+      className="rounded-lg border border-border bg-card shadow-[0_1px_2px_rgba(15,23,42,0.04)] flex flex-col cursor-pointer hover:border-primary/40 transition-colors group overflow-hidden"
       onClick={() => onView(e)}
       role="button"
       tabIndex={0}
       onKeyDown={(ev) => ev.key === "Enter" && onView(e)}
       aria-label={`View details for ${e.title}`}
     >
+      <EvidenceCover type={e.type} className="h-24" />
       <div className="px-5 py-4 border-b border-border flex items-start justify-between gap-3">
         <div className="flex items-start gap-3 min-w-0">
           <div className="h-8 w-8 rounded-md bg-muted grid place-items-center shrink-0 group-hover:bg-primary/10 transition-colors">
@@ -563,8 +600,9 @@ function EvidenceDetailModal({
       <div
         role="dialog"
         aria-modal="true"
-        className="relative z-10 bg-card rounded-xl border border-border shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col"
+        className="relative z-10 bg-card rounded-xl border border-border shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden"
       >
+        <EvidenceCover type={e.type} className="h-28 shrink-0" />
         {/* Header */}
         <div className="flex items-start justify-between px-6 py-4 border-b border-border shrink-0 gap-3">
           <div className="flex items-start gap-3 min-w-0">
