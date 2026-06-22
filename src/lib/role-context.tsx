@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 
 export type Role = "student" | "recruiter";
 
@@ -50,24 +50,28 @@ function loadRegisteredUsers(): RegisteredUser[] {
   }
 }
 
-export function RoleProvider({ children }: { children: ReactNode }) {
-  const [role, setRoleState] = useState<Role>("student");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [personId, setPersonId] = useState<string | null>(null);
-  const [registeredUsers, setRegisteredUsers] = useState<RegisteredUser[]>([]);
+function readStored(key: string): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
 
-  useEffect(() => {
-    const savedRole =
-      typeof window !== "undefined" ? window.localStorage.getItem("cgt-role") : null;
-    const savedLogin =
-      typeof window !== "undefined" ? window.localStorage.getItem("cgt-logged-in") : null;
-    const savedPersonId =
-      typeof window !== "undefined" ? window.localStorage.getItem("cgt-person-id") : null;
-    if (savedRole === "student" || savedRole === "recruiter") setRoleState(savedRole);
-    if (savedLogin === "true") setIsLoggedIn(true);
-    if (savedPersonId) setPersonId(savedPersonId);
-    setRegisteredUsers(loadRegisteredUsers());
-  }, []);
+export function RoleProvider({ children }: { children: ReactNode }) {
+  // Initialise synchronously from localStorage so the first render already knows
+  // whether the user is logged in — prevents a redirect flash (e.g. the landing
+  // page briefly appearing inside the app shell) on refresh.
+  const [role, setRoleState] = useState<Role>(() => {
+    const r = readStored("cgt-role");
+    return r === "student" || r === "recruiter" ? r : "student";
+  });
+  const [isLoggedIn, setIsLoggedIn] = useState(() => readStored("cgt-logged-in") === "true");
+  const [personId, setPersonId] = useState<string | null>(() => readStored("cgt-person-id"));
+  const [registeredUsers, setRegisteredUsers] = useState<RegisteredUser[]>(() =>
+    loadRegisteredUsers(),
+  );
 
   const setRole = (r: Role) => {
     setRoleState(r);

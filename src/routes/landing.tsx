@@ -6,11 +6,7 @@ import {
   ClipboardCheck,
   ArrowRight,
   Sparkles,
-  Target,
-  FileCheck2,
   TrendingUp,
-  BarChart3,
-  Compass,
   Play,
   Check,
 } from "lucide-react";
@@ -50,47 +46,6 @@ const PERSONAS = [
   },
 ];
 
-const STEPS = [
-  {
-    icon: FileCheck2,
-    title: "Submit evidence",
-    body: "Add a project, report, presentation or hackathon and map it to the competencies it demonstrates.",
-  },
-  {
-    icon: ClipboardCheck,
-    title: "Get it validated",
-    body: "A mentor scores each competency against a 1–10 rubric and leaves structured feedback.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Close the gap",
-    body: "Watch your readiness climb, benchmark against target roles, and act on AI-suggested next steps.",
-  },
-];
-
-const FEATURES = [
-  {
-    icon: Target,
-    title: "Role benchmarking",
-    body: "Measure yourself against the real competency profile of Software, AI, UX and Tech-Lead roles.",
-  },
-  {
-    icon: BarChart3,
-    title: "Readiness analytics",
-    body: "A composite readiness score, radar profile and per-role coverage — always up to date.",
-  },
-  {
-    icon: Compass,
-    title: "Self-calibration",
-    body: "Compare how you rate yourself against mentor scores to surface blind spots.",
-  },
-  {
-    icon: Sparkles,
-    title: "AI insights",
-    body: "Plain-English summaries of your trajectory and the highest-impact thing to do next.",
-  },
-];
-
 function LandingPage() {
   const { login } = useRole();
   const navigate = useNavigate();
@@ -119,12 +74,6 @@ function LandingPage() {
           <nav className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
             <a href="#roles" className="transition-colors hover:text-foreground">
               For you
-            </a>
-            <a href="#how" className="transition-colors hover:text-foreground">
-              How it works
-            </a>
-            <a href="#features" className="transition-colors hover:text-foreground">
-              Features
             </a>
           </nav>
           <div className="flex items-center gap-2">
@@ -300,65 +249,6 @@ function LandingPage() {
                 </span>
               </StaggerItem>
             ))}
-          </Stagger>
-        </div>
-      </section>
-
-      {/* ── How it works ────────────────────────────────────── */}
-      <section id="how" className="mx-auto max-w-6xl px-5 py-20">
-        <Reveal className="text-center">
-          <h2 className="text-3xl font-semibold tracking-tight">
-            From coursework to career-ready in three steps
-          </h2>
-        </Reveal>
-        <Stagger className="mt-12 grid gap-5 md:grid-cols-3">
-          {STEPS.map((s, i) => {
-            const Icon = s.icon;
-            return (
-              <StaggerItem key={s.title}>
-                <div className="relative h-full rounded-2xl border border-border bg-card p-6 shadow-[var(--elevation-1)]">
-                  <span className="absolute right-5 top-5 font-mono text-3xl font-bold text-primary/15">
-                    0{i + 1}
-                  </span>
-                  <div className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <h3 className="mt-4 text-lg font-semibold">{s.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
-                </div>
-              </StaggerItem>
-            );
-          })}
-        </Stagger>
-      </section>
-
-      {/* ── Features ────────────────────────────────────────── */}
-      <section id="features" className="border-t border-border bg-card/40">
-        <div className="mx-auto max-w-6xl px-5 py-20">
-          <Reveal className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-semibold tracking-tight">
-              Everything you need to close the gap
-            </h2>
-          </Reveal>
-          <Stagger className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {FEATURES.map((f) => {
-              const Icon = f.icon;
-              return (
-                <StaggerItem key={f.title}>
-                  <Lift className="h-full">
-                    <div className="h-full rounded-2xl border border-border bg-background p-5 shadow-[var(--elevation-1)]">
-                      <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <h3 className="mt-4 text-sm font-semibold">{f.title}</h3>
-                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                        {f.body}
-                      </p>
-                    </div>
-                  </Lift>
-                </StaggerItem>
-              );
-            })}
           </Stagger>
         </div>
       </section>
