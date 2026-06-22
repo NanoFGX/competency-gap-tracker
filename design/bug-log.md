@@ -1,0 +1,13 @@
+# The Bug Log
+*Phase 5: Implement · usability bugs found in evaluation, the heuristic each broke, and the fix.*
+*Table columns: **User Actions | Broken Heuristic | Solution We Implemented***
+
+| User Actions | Broken Heuristic | Solution We Implemented |
+|---|---|---|
+| Student and recruiter are placed in the same interface, causing users to be confused about which role they are currently operating in and which actions apply to them. | **#1 Visibility of System Status** | Clearly separate the interfaces into distinct student and recruiter dashboards with explicit role indicators and role-based access, so each user only sees relevant functions. |
+| A first-time user opens the product and is taken straight to the login screen, with no explanation of what the system does or who it is for, leaving them unsure whether they are even in the right place. | **#10 Help & Documentation** | Added a dedicated landing page that introduces the platform, its three user types and a live demo before any sign-in is required. |
+| A student opens their competency charts and the colours clash with the rest of the interface while the tooltips are unreadable on darker areas, so they cannot reliably interpret their own scores. | **#4 Consistency & Standards** | Drove all chart colours from the design tokens, so the radar, bars and tooltips stay consistent and legible in both light and dark mode. |
+| A user working at night or in a low-light room is forced to stare at a single bright white theme with no option to dim it, causing eye strain and discomfort. | **#3 User Control & Freedom** | Introduced a light/dark toggle (sidebar + login) that the system remembers between visits. |
+| When a user types into the GitHub-link or password field, the field's icon sits on top of the text, making what they typed hard to read and looking like a visual glitch. | **#5 Error Prevention** | Reserved dedicated space for each field's icon so the icon and the user's typed text never overlap. |
+| As a user moves between pages, the current page is marked only by a faint background tint, so they repeatedly lose track of where they are in the app. | **#1 Visibility of System Status** | Gave the active nav item a clear indigo accent bar, tinted highlight and coloured icon so the current location is obvious at a glance. |
+| An evaluator wanting to explore the system is blocked at the login screen because they have no real credentials, and must stop to create an account before seeing anything. | **#6 Recognition rather than recall** | Added one-click demo accounts for Student and Recruiter so anyone can enter and explore instantly. |

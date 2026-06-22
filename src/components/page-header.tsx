@@ -17,7 +17,7 @@ export function PageHeader({
     <div className="mb-8 flex items-start justify-between gap-4 cgt-fade">
       <div className="flex items-start gap-3.5 min-w-0">
         {icon && (
-          <div className="mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
+          <div className="mt-0.5 grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
             {icon}
           </div>
         )}
@@ -27,7 +27,9 @@ export function PageHeader({
               {eyebrow}
             </div>
           )}
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-[2rem] sm:leading-tight">
+            {title}
+          </h1>
           {description ? (
             <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
               {description}

@@ -12,7 +12,6 @@ import {
   GitCompare,
   LogOut,
   UserCircle,
-  Palette,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useStudent } from "@/lib/student-context";
@@ -143,26 +142,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </Link>
               );
             })}
-
-            <div className="px-3 pb-2 pt-5 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              Reference
-            </div>
-            <Link
-              to="/design-system"
-              className={`group relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
-                isActive(pathname, "/design-system")
-                  ? "bg-accent font-medium text-accent-foreground"
-                  : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
-              }`}
-            >
-              {isActive(pathname, "/design-system") && (
-                <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-primary" />
-              )}
-              <Palette
-                className={`h-4 w-4 transition-colors ${isActive(pathname, "/design-system") ? "text-primary" : "text-muted-foreground group-hover:text-foreground"}`}
-              />
-              Design system
-            </Link>
           </nav>
 
           <div className="border-t border-border px-4 py-4">
@@ -249,12 +228,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </Link>
               );
             })}
-            <Link
-              to="/design-system"
-              className={`whitespace-nowrap rounded-md px-3 py-1.5 text-xs transition-colors ${isActive(pathname, "/design-system") ? "bg-accent font-medium text-accent-foreground" : "text-muted-foreground"}`}
-            >
-              Design system
-            </Link>
           </div>
 
           <div className="mx-auto w-full max-w-6xl px-6 py-8 md:px-10">{children}</div>

@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Competency Gap Tracker — Design System (Trust Indigo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --radius:10px;
+    --bg:#F5F6F9; --card:#FFFFFF; --fg:#1E2333; --mut:#6B7280; --border:#E6E8EE;
+    --primary:#4F46E5; --primary-hover:#4338CA; --primary-fg:#FFFFFF;
+    --secondary:#475569; --accent:#EEEDFB; --accent-fg:#4338CA;
+    --success:#16A34A; --warning:#D97706; --error:#DC2626; --track:#ECEDF2;
+    --e1:0 1px 2px rgba(15,23,42,.06); --e2:0 6px 20px -6px rgba(15,23,42,.14);
+    --e3:0 18px 44px -16px rgba(15,23,42,.22);
+  }
+  html[data-theme="dark"]{
+    --bg:#15171F; --card:#1E2130; --fg:#F1F2F6; --mut:#A6ABBA; --border:#2C3142;
+    --primary:#7B78EC; --primary-hover:#938FF2; --primary-fg:#15171F;
+    --secondary:#94A3B8; --accent:#2A2C45; --accent-fg:#C7C5F5;
+    --success:#3FCD80; --warning:#F4B84A; --error:#F0625F; --track:#2A2E3D;
+    --e1:0 1px 2px rgba(0,0,0,.5); --e2:0 6px 20px -6px rgba(0,0,0,.6); --e3:0 18px 44px -16px rgba(0,0,0,.7);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:"Inter",system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;transition:background .2s,color .2s}
+  .wrap{max-width:1040px;margin:0 auto;padding:40px 24px 80px}
+  .mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+  h1{font-size:40px;font-weight:800;letter-spacing:-.02em;margin:0}
+  h2{font-size:14px;font-weight:600;margin:0}
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--primary);margin-bottom:8px}
+  .sub{color:var(--mut);font-size:15px;max-width:60ch}
+  .section-h{display:flex;align-items:center;gap:10px;margin:48px 0 16px}
+  .section-h .ic{width:30px;height:30px;border-radius:8px;background:color-mix(in oklab,var(--primary) 12%,transparent);display:grid;place-items:center;color:var(--primary);font-size:15px}
+  .section-h .t{font-size:15px;font-weight:600}
+  .section-h .d{font-size:12px;color:var(--mut)}
+  .grid{display:grid;gap:16px}
+  @media(min-width:720px){.g2{grid-template-columns:1fr 1fr}.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--e1);overflow:hidden}
+  .card-h{padding:16px 18px;border-bottom:1px solid var(--border)}
+  .card-h .ct{font-size:14px;font-weight:600}
+  .card-h .cd{font-size:12px;color:var(--mut);margin-top:2px}
+  .card-b{padding:18px}
+  /* swatches */
+  .sw{display:flex;gap:12px;align-items:center;border:1px solid var(--border);border-radius:10px;padding:12px}
+  .sw .chip{width:48px;height:48px;border-radius:10px;display:grid;place-items:center;font-size:10px;font-weight:700;flex:none}
+  .sw .nm{font-weight:600;font-size:14px}
+  .sw .ro{font-size:12px;color:var(--mut)}
+  .sw .hx{font-size:11px;color:var(--mut)}
+  .neu{display:flex;align-items:center;gap:12px;padding:6px 0}
+  .neu .b{width:32px;height:32px;border-radius:8px;border:1px solid var(--border)}
+  /* type */
+  .type-row{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:14px 0;border-bottom:1px solid var(--border)}
+  .type-row:last-child{border-bottom:0}
+  .spec{font-size:11px;color:var(--mut);white-space:nowrap}
+  /* buttons */
+  .btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;font-family:inherit;font-weight:500;font-size:14px;padding:10px 16px;cursor:pointer;transition:background .15s,box-shadow .15s,transform .12s,opacity .15s}
+  .btn:active{transform:scale(.97)}
+  .btn:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+  .btn-primary{background:var(--primary);color:var(--primary-fg);box-shadow:var(--e1)}
+  .btn-primary:hover{background:var(--primary-hover)}
+  .btn-secondary{background:var(--accent);color:var(--accent-fg)}
+  .btn-outline{background:var(--card);color:var(--fg);border:1px solid var(--border);box-shadow:var(--e1)}
+  .btn-outline:hover{background:var(--accent)}
+  .btn-ghost{background:transparent;color:var(--mut)}
+  .btn-ghost:hover{background:var(--accent);color:var(--fg)}
+  .btn-danger{background:var(--error);color:#fff}
+  .btn-success{background:var(--success);color:#fff}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .statechips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .statechip{font-size:11px;color:var(--mut);border:1px solid var(--border);background:color-mix(in oklab,var(--mut) 8%,transparent);border-radius:7px;padding:4px 8px}
+  /* inputs */
+  label.fl{display:block;font-size:12px;font-weight:500;color:var(--mut);margin:0 0 6px}
+  .inp{width:100%;height:38px;border:1px solid var(--border);background:var(--bg);color:var(--fg);border-radius:9px;padding:0 12px;font:inherit;font-size:14px;outline:none}
+  .inp:focus-visible{box-shadow:0 0 0 2px var(--primary)}
+  .inp.err{border-color:var(--error)}
+  textarea.inp{height:auto;padding:10px 12px;resize:none}
+  .field+.field{margin-top:12px}
+  /* badges */
+  .pill{display:inline-flex;align-items:center;gap:6px;border-radius:7px;padding:3px 9px;font-size:12px;font-weight:500}
+  .pill .dot{width:7px;height:7px;border-radius:50%}
+  /* progress */
+  .pbar{display:flex;align-items:center;gap:12px;font-size:13px;margin-bottom:12px}
+  .pbar .lab{width:140px;color:var(--mut);font-size:12px;flex:none}
+  .track{position:relative;flex:1;height:9px;border-radius:999px;background:var(--track);border:1px solid var(--border)}
+  .fill{position:absolute;inset:0 auto 0 0;border-radius:999px;background:var(--primary)}
+  .marker{position:absolute;top:-3px;bottom:-3px;width:2px;background:color-mix(in oklab,var(--fg) 55%,transparent)}
+  .val{width:48px;text-align:right;font-size:12px}
+  /* banners */
+  .banner{display:flex;gap:10px;align-items:flex-start;border-radius:10px;padding:12px 14px;font-size:13px;margin-bottom:10px;border:1px solid}
+  /* table */
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:500;padding:12px 18px;border-bottom:1px solid var(--border)}
+  td{padding:12px 18px;border-bottom:1px solid var(--border);vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  .pain{font-style:italic;color:var(--mut)}
+  .hnum{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:6px;background:color-mix(in oklab,var(--primary) 12%,transparent);color:var(--primary);font-weight:600;font-size:12px}
+  .persona-h{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--border)}
+  .persona-h .pi{width:36px;height:36px;border-radius:9px;background:color-mix(in oklab,var(--primary) 12%,transparent);display:grid;place-items:center;color:var(--primary)}
+  /* theme toggle */
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+  .toggle{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--card);color:var(--fg);border-radius:10px;padding:8px 12px;font:inherit;font-size:13px;cursor:pointer}
+  .footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--border);font-size:12px;color:var(--mut)}
+  @media print{.toggle{display:none}body{background:#fff}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div>
+      <div class="eyebrow">Reference</div>
+      <h1>Design System</h1>
+      <p class="sub" style="margin-top:12px">The single source of truth for Competency Gap Tracker — tokens, type, interactive components and the persona pain-to-feature audit trail. Direction A “Trust Indigo”, themeable for light and dark.</p>
+    </div>
+    <button class="toggle" id="themeBtn" onclick="toggleTheme()">🌙 <span id="themeLbl">Dark mode</span></button>
+  </div>
+
+  <!-- COLOUR -->
+  <div class="section-h"><span class="ic">◑</span><div><div class="t">Colour</div><div class="d">1 primary · 1 secondary · 3 functional · accessible neutrals (WCAG AA)</div></div></div>
+  <div class="grid g2">
+    <div class="card">
+      <div class="card-h"><div class="ct">Brand &amp; functional</div><div class="cd">Every colour carries meaning</div></div>
+      <div class="card-b grid g2" id="swatches"></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><div class="ct">Neutrals &amp; surfaces</div><div class="cd">Layering scale for backgrounds, cards and text</div></div>
+      <div class="card-b" id="neutrals"></div>
+    </div>
+  </div>
+
+  <!-- TYPE -->
+  <div class="section-h"><span class="ic">A</span><div><div class="t">Typography</div><div class="d">Inter for UI · JetBrains Mono for scores and data</div></div></div>
+  <div class="card"><div class="card-b" id="typescale"></div></div>
+
+  <!-- COMPONENTS -->
+  <div class="section-h"><span class="ic">▥</span><div><div class="t">Component library</div><div class="d">Reusable master components — hover and click them, the states are real</div></div></div>
+  <div class="grid g2">
+    <div class="card">
+      <div class="card-h"><div class="ct">Buttons</div><div class="cd">6 variants · hover, active, focus, disabled</div></div>
+      <div class="card-b">
+        <div class="row">
+          <button class="btn btn-primary">Primary</button>
+          <button class="btn btn-secondary">Secondary</button>
+          <button class="btn btn-outline">Outline</button>
+          <button class="btn btn-ghost">Ghost</button>
+          <button class="btn btn-danger">Destructive</button>
+          <button class="btn btn-success">Success</button>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn btn-primary" style="padding:6px 12px;font-size:12px">Small</button>
+          <button class="btn btn-primary">Medium</button>
+          <button class="btn btn-primary" style="padding:12px 20px">Large</button>
+          <button class="btn btn-primary" disabled>Disabled</button>
+        </div>
+        <div class="statechips">
+          <span class="statechip">hover → brand-darkens</span>
+          <span class="statechip">focus → 2px ring</span>
+          <span class="statechip">active → press-scale</span>
+          <span class="statechip">disabled → 50% + no events</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-h"><div class="ct">Form fields</div><div class="cd">One focus treatment · default, focus and error</div></div>
+      <div class="card-b">
+        <div class="field"><label class="fl">Default input</label><input class="inp" value="Aisha Rahman" /></div>
+        <div class="field"><label class="fl">Select</label>
+          <select class="inp"><option>Software Engineer</option><option>AI Engineer</option><option>UX Engineer</option></select></div>
+        <div class="field"><label class="fl">Error state</label><input class="inp err" placeholder="Required field" />
+          <div style="color:var(--error);font-size:12px;margin-top:4px">This field is required.</div></div>
+        <div class="field"><label class="fl">Textarea</label><textarea class="inp" rows="2" placeholder="Structured feedback…"></textarea></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-h"><div class="ct">Badges &amp; status</div><div class="cd">Token-derived tones — legible in light and dark</div></div>
+      <div class="card-b">
+        <div class="row" id="statusbadges"></div>
+        <div class="row" id="pills" style="margin-top:12px"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-h"><div class="ct">Data viz &amp; feedback</div><div class="cd">Marker progress bar + system banners</div></div>
+      <div class="card-b">
+        <div id="bars"></div>
+        <div id="banners" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOTION -->
+  <div class="section-h"><span class="ic">✦</span><div><div class="t">Motion</div><div class="d">Purposeful micro-interactions · respects prefers-reduced-motion</div></div></div>
+  <div class="card"><div class="card-b grid g3">
+    <div><div style="font-weight:600;font-size:14px">Entrance</div><div style="font-size:12px;color:var(--mut);margin-top:4px">Content rises + fades on mount</div></div>
+    <div><div style="font-weight:600;font-size:14px">Press</div><div style="font-size:12px;color:var(--mut);margin-top:4px">Every button scales to 0.97 on :active</div></div>
+    <div><div style="font-weight:600;font-size:14px">Transitions</div><div style="font-size:12px;color:var(--mut);margin-top:4px">Bars, donuts &amp; nav animate over 160–700ms</div></div>
+  </div></div>
+
+  <!-- CROSSWALK -->
+  <div class="section-h"><span class="ic">◎</span><div><div class="t">Pain-to-Feature crosswalk</div><div class="d">Form follows friction — every feature resolves a documented persona pain</div></div></div>
+  <div class="grid" id="crosswalk"></div>
+
+  <!-- HEURISTICS -->
+  <div class="section-h"><span class="ic">✓</span><div><div class="t">Nielsen heuristic index</div><div class="d">Where each of the 10 usability heuristics is applied</div></div></div>
+  <div class="card"><table><thead><tr><th>#</th><th>Heuristic</th><th>Applied in</th></tr></thead><tbody id="heuristics"></tbody></table></div>
+
+  <div class="footer">Competency Gap Tracker · Design System (Trust Indigo) · generated companion to the live <code>/design-system</code> page.</div>
+</div>
+
+<script>
+function toggleTheme(){
+  const h=document.documentElement, dark=h.getAttribute('data-theme')==='dark';
+  h.setAttribute('data-theme',dark?'light':'dark');
+  document.getElementById('themeBtn').firstChild.textContent = dark?'🌙 ':'☀️ ';
+  document.getElementById('themeLbl').textContent = dark?'Dark mode':'Light mode';
+}
+const cm=(v,p)=>`color-mix(in oklab, var(${v}) ${p}%, transparent)`;
+const tone=(v)=>({background:cm(v,15),color:`color-mix(in oklab, var(${v}) 72%, var(--fg))`,boxShadow:`inset 0 0 0 1px ${cm(v,28)}`});
+// swatches
+const brand=[["Primary","Actions, focus, brand","#4F46E5","--primary","--primary-fg"],["Slate","Structure, data surfaces","#475569","--secondary","--card"],
+["Success","Approved · target met","#16A34A","--success","#fff"],["Warning","Pending · attention","#D97706","--warning","#1E2333"],["Error","Rejected · destructive","#DC2626","--error","#fff"]];
+document.getElementById('swatches').innerHTML=brand.map(([n,r,hx,bg,fg])=>
+ `<div class="sw"><div class="chip" style="background:var(${bg});color:${fg.startsWith('--')?'var('+fg+')':fg}">Aa</div><div><div class="nm">${n}</div><div class="ro">${r}</div><div class="hx mono">${hx}</div></div></div>`).join('');
+const neu=[["Background","--bg"],["Card","--card"],["Accent","--accent"],["Border","--border"],["Muted text","--mut"],["Foreground","--fg"]];
+document.getElementById('neutrals').innerHTML=neu.map(([n,v])=>`<div class="neu"><span class="b" style="background:var(${v})"></span><span style="font-size:14px">${n}</span><code class="mono" style="margin-left:auto;font-size:11px;color:var(--mut)">${v}</code></div>`).join('');
+// type
+const ts=[["Display","font-size:30px;font-weight:600;letter-spacing:-.02em","Inter SemiBold · 30/36"],["Heading 1","font-size:24px;font-weight:600","Inter SemiBold · 24/32"],
+["Heading 2","font-size:18px;font-weight:600","Inter SemiBold · 18/28"],["Heading 3","font-size:14px;font-weight:600","Inter SemiBold · 14/20"],
+["Body","font-size:14px","Inter Regular · 14/22"],["Small / caption","font-size:12px;color:var(--mut)","Inter Regular · 12/16"]];
+document.getElementById('typescale').innerHTML=ts.map(([l,s,sp])=>`<div class="type-row"><span style="${s}">${l}</span><span class="spec mono">${sp}</span></div>`).join('')
+ +`<div class="type-row"><span class="mono" style="font-size:14px">Problem Solving · 8/10</span><span class="spec mono">JetBrains Mono · numeric</span></div>`;
+// badges
+const sb=[["Approved","--success"],["Pending","--warning"],["Rejected","--error"]];
+document.getElementById('statusbadges').innerHTML=sb.map(([s,v])=>{const t=tone(v);return `<span class="pill" style="background:${t.background};color:${t.color};box-shadow:${t.boxShadow}"><span class="dot" style="background:currentColor"></span>${s}</span>`}).join('');
+const pl=[["Strong · 8/10","--success"],["Developing","--mut"],["Needs work","--error"],["At risk","--warning"],["Active","--primary"]];
+document.getElementById('pills').innerHTML=pl.map(([s,v])=>{const t=tone(v);return `<span class="pill" style="background:${t.background};color:${t.color};box-shadow:${t.boxShadow}">${s}</span>`}).join('');
+// bars
+function bar(l,val,tg){const met=val>=tg;return `<div class="pbar"><span class="lab">${l}</span><div class="track"><div class="fill" style="width:${val*10}%;background:${met?'var(--success)':'var(--primary)'}"></div><div class="marker" style="left:${tg*10}%"></div></div><span class="val mono" style="color:${met?'var(--success)':'var(--mut)'}">${val}/${tg}</span></div>`}
+document.getElementById('bars').innerHTML=bar("Problem Solving",8,10)+bar("UX Empathy",4,6);
+// banners
+function banner(v,msg){return `<div class="banner" style="border-color:${cm(v,32)};background:color-mix(in oklab, var(${v}) 11%, var(--card));color:color-mix(in oklab, var(${v}) 70%, var(--fg))">${msg}</div>`}
+document.getElementById('banners').innerHTML=banner("--success","Evidence approved — scores added to your profile.")+banner("--warning","Submission is pending mentor review.")+banner("--error","Couldn’t submit — check the highlighted fields.");
+// crosswalk
+const personas=[
+ ["Student","Final-year CS jobseeker",[
+  ["“I can’t tell if I’m actually job-ready or what’s holding me back.”","Career-readiness %, radar profile and role-readiness bars","Dashboard","#1 Visibility of status"],
+  ["“My soft skills are invisible on a CV or GPA.”","6-competency model with mentor-validated scores + evidence mapping","Evidence · Profile","#6 Recognition over recall"],
+  ["“I don’t know what a specific role actually requires.”","Gap breakdown vs role benchmark, priority gaps, fit-across-roles","Career Target","#2 Match the real world"],
+  ["“I over/under-estimate my own ability.”","Self-check: self-rating vs mentor scores, calibration blind-spots","Self-check","#9 Recognise &amp; diagnose"],
+  ["“I can’t see whether I’m improving.”","Progression timeline + growth delta + AI next-milestone","Progression","#1 Visibility of status"],
+  ["“Submitting work is fiddly and I’m afraid of mistakes.”","Guided form with inline validation, confirm + withdraw","Evidence","#5 Error prevention"]]],
+ ["Recruiter","Screening many candidates",[
+  ["“CV claims are unverifiable — I waste time on unqualified candidates.”","Mentor-validated scores, approval rate and evidence audit trail","Candidates","#1 Visibility of status"],
+  ["“Comparing candidates is slow and subjective.”","Pipeline ranked by role-fit + readiness; cohort table &amp; gap heatmap","Candidates","#6 Recognition over recall"],
+  ["“I can’t map a candidate to a role’s real needs.”","Per-role hire recommendation: Recommend / Consider / Not ready","Role benchmarks","#2 Match the real world"],
+  ["“Dense data is exhausting to scan.”","Low-intensity palette, clear data grids, donuts &amp; marker bars","All recruiter views","#8 Aesthetic &amp; minimal"]]],
+ ["Mentor / Lecturer","Validating evidence",[
+  ["“Scoring is inconsistent without a shared rubric.”","1–10 rubric with a descriptor for every level, score-all-competencies","Validate claims","#4 Consistency &amp; standards"],
+  ["“I might approve or reject by mistake.”","Confirmation dialogs on every decision + one-click Undo","Validate claims","#5 Error prevention · #3 Control"],
+  ["“It’s hard to track what I’ve already decided.”","Decision log + per-student pending/approved counters","Validate claims","#1 Visibility of status"],
+  ["“I need full context to evaluate fairly.”","Complete description, links, and highlighted claimed competencies","Validate claims","#6 Recognition over recall"]]]];
+document.getElementById('crosswalk').innerHTML=personas.map(([p,tag,rows])=>
+ `<div class="card"><div class="persona-h"><span class="pi">◆</span><div><div style="font-weight:600;font-size:14px">${p}</div><div style="font-size:12px;color:var(--mut)">${tag}</div></div></div>
+  <table><thead><tr><th>Persona pain</th><th>Hi-fi feature that resolves it</th><th>Where</th><th>Heuristic</th></tr></thead><tbody>
+  ${rows.map(([a,b,c,d])=>{const t=tone('--primary');return `<tr><td class="pain">${a}</td><td>${b}</td><td><span class="pill" style="background:${t.background};color:${t.color};box-shadow:${t.boxShadow}">${c}</span></td><td style="font-size:12px;color:var(--mut)">${d}</td></tr>`}).join('')}
+  </tbody></table></div>`).join('');
+// heuristics
+const H=[["1","Visibility of system status","Readiness %, status badges, step indicators, toasts"],["2","Match between system &amp; real world","“Career-ready”, role names, 1–10 level labels"],
+["3","User control &amp; freedom","Cancel/Close, Esc-to-close, Withdraw, Undo, theme toggle"],["4","Consistency &amp; standards","Shared component kit, one rubric, design tokens"],
+["5","Error prevention","Confirm dialogs, inline validation, separated destructive actions"],["6","Recognition rather than recall","Score legend, info tooltips, demo quick-fill, persistent labels"],
+["7","Flexibility &amp; efficiency of use","Search, filters, role/student switchers, keyboard support"],["8","Aesthetic &amp; minimalist design","Low-intensity palette, clear hierarchy, generous whitespace"],
+["9","Help users recognise &amp; recover from errors","Specific field-level errors, recovery banners"],["10","Help &amp; documentation","Metric tooltips and this living design system"]];
+document.getElementById('heuristics').innerHTML=H.map(([n,nm,w])=>`<tr><td><span class="hnum">${n}</span></td><td style="font-weight:500">${nm}</td><td style="color:var(--mut)">${w}</td></tr>`).join('');
+</script>
+</body>
+</html>
