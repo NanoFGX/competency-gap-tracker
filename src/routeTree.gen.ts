@@ -18,7 +18,6 @@ import { Route as MentorRouteImport } from './routes/mentor'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LandingRouteImport } from './routes/landing'
 import { Route as EvidenceRouteImport } from './routes/evidence'
-import { Route as DesignSystemRouteImport } from './routes/design-system'
 import { Route as CareerRouteImport } from './routes/career'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -67,11 +66,6 @@ const EvidenceRoute = EvidenceRouteImport.update({
   path: '/evidence',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DesignSystemRoute = DesignSystemRouteImport.update({
-  id: '/design-system',
-  path: '/design-system',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CareerRoute = CareerRouteImport.update({
   id: '/career',
   path: '/career',
@@ -86,7 +80,6 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/career': typeof CareerRoute
-  '/design-system': typeof DesignSystemRoute
   '/evidence': typeof EvidenceRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
@@ -100,7 +93,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/career': typeof CareerRoute
-  '/design-system': typeof DesignSystemRoute
   '/evidence': typeof EvidenceRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
@@ -115,7 +107,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/career': typeof CareerRoute
-  '/design-system': typeof DesignSystemRoute
   '/evidence': typeof EvidenceRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
@@ -131,7 +122,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/career'
-    | '/design-system'
     | '/evidence'
     | '/landing'
     | '/login'
@@ -145,7 +135,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/career'
-    | '/design-system'
     | '/evidence'
     | '/landing'
     | '/login'
@@ -159,7 +148,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/career'
-    | '/design-system'
     | '/evidence'
     | '/landing'
     | '/login'
@@ -174,7 +162,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CareerRoute: typeof CareerRoute
-  DesignSystemRoute: typeof DesignSystemRoute
   EvidenceRoute: typeof EvidenceRoute
   LandingRoute: typeof LandingRoute
   LoginRoute: typeof LoginRoute
@@ -251,13 +238,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EvidenceRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/design-system': {
-      id: '/design-system'
-      path: '/design-system'
-      fullPath: '/design-system'
-      preLoaderRoute: typeof DesignSystemRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/career': {
       id: '/career'
       path: '/career'
@@ -278,7 +258,6 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CareerRoute: CareerRoute,
-  DesignSystemRoute: DesignSystemRoute,
   EvidenceRoute: EvidenceRoute,
   LandingRoute: LandingRoute,
   LoginRoute: LoginRoute,

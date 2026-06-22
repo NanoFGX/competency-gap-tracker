@@ -414,9 +414,6 @@ function LandingPage() {
             <Link to="/signup" className="transition-colors hover:text-foreground">
               Sign up
             </Link>
-            <Link to="/design-system" className="transition-colors hover:text-foreground">
-              Design system
-            </Link>
           </div>
         </div>
       </footer>

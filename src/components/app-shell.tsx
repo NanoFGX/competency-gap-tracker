@@ -46,7 +46,6 @@ const PAGE_LABELS: Record<string, string> = {
   "/profile": "My Profile",
   "/recruiter": "Candidates",
   "/mentor": "Review",
-  "/design-system": "Design System",
 };
 
 function Brand({ compact = false }: { compact?: boolean }) {
