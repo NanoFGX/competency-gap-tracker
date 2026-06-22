@@ -2,16 +2,18 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   GraduationCap,
-  ShieldCheck,
   ClipboardCheck,
   ArrowRight,
   Sparkles,
+  Target,
+  FileCheck2,
   TrendingUp,
+  BarChart3,
+  Compass,
   Play,
   Check,
 } from "lucide-react";
 import { useRole } from "@/lib/role-context";
-import { COMPETENCIES } from "@/lib/mock-data";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { FadeIn, Reveal, Stagger, StaggerItem, AnimatedNumber, Lift } from "@/components/motion";
 
@@ -22,27 +24,44 @@ export const Route = createFileRoute("/landing")({
 
 const EASE = [0.23, 1, 0.32, 1] as const;
 
-const PERSONAS = [
+const STEPS = [
   {
-    icon: GraduationCap,
-    title: "Students",
-    tag: "Final-year jobseekers",
-    line: "Turn coursework, projects and hackathons into a mentor-validated competency profile — and see exactly which skills stand between you and the role you want.",
-    points: ["Evidence-backed profile", "Gap analysis vs real roles", "Progression over time"],
-  },
-  {
-    icon: ShieldCheck,
-    title: "Recruiters",
-    tag: "Screening candidates",
-    line: "Stop guessing from CV claims. Compare candidates on validated competency, ranked by fit for the exact role you're hiring for.",
-    points: ["Verified, not asserted", "Rank by role fit", "Evidence audit trail"],
+    icon: FileCheck2,
+    title: "Submit evidence",
+    body: "Add a project, report, presentation or hackathon and map it to the competencies it demonstrates.",
   },
   {
     icon: ClipboardCheck,
-    title: "Mentors",
-    tag: "Validating evidence",
-    line: "Score submissions against one shared rubric, leave structured feedback, and approve or reject with full confidence and undo.",
-    points: ["1–10 shared rubric", "Confirm + undo", "Decision log"],
+    title: "Get it validated",
+    body: "A mentor scores each competency against a 1–10 rubric and leaves structured feedback.",
+  },
+  {
+    icon: TrendingUp,
+    title: "Close the gap",
+    body: "Watch your readiness climb, benchmark against target roles, and act on AI-suggested next steps.",
+  },
+];
+
+const FEATURES = [
+  {
+    icon: Target,
+    title: "Role benchmarking",
+    body: "Measure yourself against the real competency profile of Software, AI, UX and Tech-Lead roles.",
+  },
+  {
+    icon: BarChart3,
+    title: "Readiness analytics",
+    body: "A composite readiness score, radar profile and per-role coverage — always up to date.",
+  },
+  {
+    icon: Compass,
+    title: "Self-calibration",
+    body: "Compare how you rate yourself against mentor scores to surface blind spots.",
+  },
+  {
+    icon: Sparkles,
+    title: "AI insights",
+    body: "Plain-English summaries of your trajectory and the highest-impact thing to do next.",
   },
 ];
 
@@ -72,8 +91,11 @@ function LandingPage() {
             </div>
           </div>
           <nav className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
-            <a href="#roles" className="transition-colors hover:text-foreground">
-              For you
+            <a href="#how" className="transition-colors hover:text-foreground">
+              How it works
+            </a>
+            <a href="#features" className="transition-colors hover:text-foreground">
+              Features
             </a>
           </nav>
           <div className="flex items-center gap-2">
@@ -191,64 +213,61 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* ── Roles ───────────────────────────────────────────── */}
-      <section id="roles" className="mx-auto max-w-6xl px-5 py-20">
-        <Reveal className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-semibold tracking-tight">One platform, three viewpoints</h2>
-          <p className="mt-3 text-muted-foreground">
-            Every feature resolves a real pain for the person using it — students, recruiters and
-            mentors.
-          </p>
+      {/* ── How it works ────────────────────────────────────── */}
+      <section id="how" className="mx-auto max-w-6xl px-5 py-20">
+        <Reveal className="text-center">
+          <h2 className="text-3xl font-semibold tracking-tight">
+            From coursework to career-ready in three steps
+          </h2>
         </Reveal>
         <Stagger className="mt-12 grid gap-5 md:grid-cols-3">
-          {PERSONAS.map((p) => {
-            const Icon = p.icon;
+          {STEPS.map((s, i) => {
+            const Icon = s.icon;
             return (
-              <StaggerItem key={p.title}>
-                <Lift className="h-full">
-                  <div className="h-full rounded-2xl border border-border bg-card p-6 shadow-[var(--elevation-1)]">
-                    <div className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div className="mt-4 flex items-baseline gap-2">
-                      <h3 className="text-lg font-semibold">{p.title}</h3>
-                      <span className="text-xs text-muted-foreground">{p.tag}</span>
-                    </div>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.line}</p>
-                    <ul className="mt-4 space-y-2">
-                      {p.points.map((pt) => (
-                        <li key={pt} className="flex items-center gap-2 text-sm">
-                          <Check className="h-4 w-4 shrink-0 text-success" /> {pt}
-                        </li>
-                      ))}
-                    </ul>
+              <StaggerItem key={s.title}>
+                <div className="relative h-full rounded-2xl border border-border bg-card p-6 shadow-[var(--elevation-1)]">
+                  <span className="absolute right-5 top-5 font-mono text-3xl font-bold text-primary/15">
+                    0{i + 1}
+                  </span>
+                  <div className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
+                    <Icon className="h-5 w-5" />
                   </div>
-                </Lift>
+                  <h3 className="mt-4 text-lg font-semibold">{s.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
+                </div>
               </StaggerItem>
             );
           })}
         </Stagger>
       </section>
 
-      {/* ── Competency model ────────────────────────────────── */}
-      <section className="border-y border-border bg-card/40">
-        <div className="mx-auto max-w-6xl px-5 py-16">
-          <Reveal className="text-center">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary/80">
-              The model
-            </div>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight">
-              Six competencies that actually matter
+      {/* ── Features ────────────────────────────────────────── */}
+      <section id="features" className="border-t border-border bg-card/40">
+        <div className="mx-auto max-w-6xl px-5 py-20">
+          <Reveal className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-semibold tracking-tight">
+              Everything you need to close the gap
             </h2>
           </Reveal>
-          <Stagger className="mx-auto mt-10 flex max-w-3xl flex-wrap justify-center gap-3">
-            {COMPETENCIES.map((c) => (
-              <StaggerItem key={c}>
-                <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium shadow-[var(--elevation-1)]">
-                  <span className="h-2 w-2 rounded-full bg-primary" /> {c}
-                </span>
-              </StaggerItem>
-            ))}
+          <Stagger className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {FEATURES.map((f) => {
+              const Icon = f.icon;
+              return (
+                <StaggerItem key={f.title}>
+                  <Lift className="h-full">
+                    <div className="h-full rounded-2xl border border-border bg-background p-5 shadow-[var(--elevation-1)]">
+                      <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <h3 className="mt-4 text-sm font-semibold">{f.title}</h3>
+                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                        {f.body}
+                      </p>
+                    </div>
+                  </Lift>
+                </StaggerItem>
+              );
+            })}
           </Stagger>
         </div>
       </section>
